@@ -1,0 +1,9 @@
+.react-quiz-container {
+    width: auto !important
+}
+p {
+    white-space: pre-wrap;
+}
+.react-quiz-container .questionWrapper .btn {
+    white-space: pre-wrap !important;
+}

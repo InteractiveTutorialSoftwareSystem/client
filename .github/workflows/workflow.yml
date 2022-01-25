@@ -1,0 +1,42 @@
+name: React CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: NPM Install
+      run: |
+        REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }} REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }} REACT_APP_TUTORIAL_URL=${{ secrets.REACT_APP_TUTORIAL_URL }} REACT_APP_STACKEXCHANGE_KEY=${{ secrets.REACT_APP_STACKEXCHANGE_KEY }} npm install
+    - name: Production Build
+      run: |
+        REACT_APP_AUTH_URL=${{ secrets.REACT_APP_AUTH_URL }} REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }} REACT_APP_TUTORIAL_URL=${{ secrets.REACT_APP_TUTORIAL_URL }} REACT_APP_STACKEXCHANGE_KEY=${{ secrets.REACT_APP_STACKEXCHANGE_KEY }} npm run build
+      env: 
+        REACT_APP_AUTH_URL: ${{ secrets.REACT_APP_AUTH_URL }}
+        REACT_APP_GOOGLE_CLIENT_ID: ${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}
+        REACT_APP_TUTORIAL_URL: ${{ secrets.REACT_APP_TUTORIAL_URL }}
+        REACT_APP_STACKEXCHANGE_KEY: ${{ secrets.REACT_APP_STACKEXCHANGE_KEY }}
+    - name: Deploy to S3
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: 'ap-southeast-1'
+        SOURCE_DIR: 'build' 
