@@ -92,3 +92,7 @@ npm start
 The frontend has now been successfully setup and ready to be used concurrently with the backend. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 Once you are done, press ```Ctrl``` + ```C``` to **terminate** the application server. 
+
+## References
+Ouh, Eng Lieh, Benjamin Kok Siew Gan, and David Lo. "ITSS: Interactive Web-Based Authoring and Playback Integrated Environment for Programming Tutorials." arXiv preprint arXiv:2204.08593 (2022).
+[link](https://arxiv.org/pdf/2204.08593)
