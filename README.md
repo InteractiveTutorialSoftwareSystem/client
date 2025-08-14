@@ -299,8 +299,8 @@ PORT=3001 npm start
 - ESLint security rules enforcement
 
 ## References
-Ouh, Eng Lieh, Benjamin Kok Siew Gan, and David Lo. "ITSS: Interactive Web-Based Authoring and Playback Integrated Environment for Programming Tutorials." arXiv preprint arXiv:2204.08593 (2022).
-[📄 Research Paper](https://arxiv.org/pdf/2204.08593)
+Ouh, Eng Lieh, Benjamin Kok Siew Gan, and David Lo. "ITSS: Interactive Web-Based Authoring and Playback Integrated Environment for Programming Tutorials." Proceedings of the 2022 ACM Conference on International Computing Education Research-Volume 1. 2022.
+[📄 Research Paper](https://dl.acm.org/doi/10.1145/3510456.3514142)
 
 ---
 
