@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useHistory, useParams, Link } from "react-router-dom";
-import moment from 'moment';
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { format, isAfter, parseISO } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -12,30 +13,30 @@ import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
-import Snackbar from '@material-ui/core/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from "components/Snackbar/SnackbarContent.js";
-import Tooltip from "@material-ui/core/Tooltip";
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
+import Tooltip from "@mui/material/Tooltip";
+import TextField from '@mui/material/TextField';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import styled from "styled-components";
 
 import styles from "assets/jss/material-kit-react/views/tutorialOverviewPage.js";
 
 // Modal
-import Slide from "@material-ui/core/Slide";
+import Slide from "@mui/material/Slide";
 import Modal from 'react-bootstrap/Modal';
-import IconButton from "@material-ui/core/IconButton";
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import IconButton from "@mui/material/IconButton";
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import DeleteIcon from '@material-ui/icons/Delete';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
-import CodeIcon from '@material-ui/icons/Code';
-import Check from "@material-ui/icons/Check";
+import DeleteIcon from '@mui/icons-material/Delete';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import CodeIcon from '@mui/icons-material/Code';
+import Check from "@mui/icons-material/Check";
 
-import InfoIcon from '@material-ui/icons/Info';
+import InfoIcon from '@mui/icons-material/Info';
 import image from "assets/img/bg7.jpg";
 
 const useStyles = makeStyles(styles);
@@ -53,7 +54,7 @@ const Item = styled.div`
   margin-bottom: 8px;
 `;
 
-const Transition = React.forwardRef(function Transition(props, ref) {
+const Transition = React.forwardRef((props, ref) => {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
@@ -63,7 +64,7 @@ export default function TutorialOverviewPage(props) {
   
   const classes = useStyles();
   const { ...rest } = props;
-  const history = useHistory();
+  const navigate = useNavigate();
   const { id } = useParams();
   
   const [tutorialName, setTutorialName] = useState("")
@@ -129,7 +130,8 @@ export default function TutorialOverviewPage(props) {
         setLanguageChosen(data.language)
         if (unorderedSequence) {
           const result = []
-          for (const seq of eval(data.sequence)){
+          const sequence = JSON.parse(data.sequence);
+          for (const seq of sequence){
             for (const elem of unorderedSequence) {
               if (elem.id == seq) {
                 result.push(elem)
@@ -140,9 +142,9 @@ export default function TutorialOverviewPage(props) {
         }
         const dateTimeNow = new Date();
         if (data.start_date != null) {
-          if (moment(dateTimeNow).isAfter(moment(data.start_date)) && data.end_date == null) {
+          if (isAfter(dateTimeNow, parseISO(data.start_date)) && data.end_date == null) {
             setIsHidden(false)
-          } else if (moment(dateTimeNow).isAfter(moment(data.start_date)) && moment(data.end_date).isAfter(moment(dateTimeNow))) {
+          } else if (isAfter(dateTimeNow, parseISO(data.start_date)) && isAfter(parseISO(data.end_date), dateTimeNow)) {
             setIsHidden(false)
           } else {
             setIsHidden(true)
@@ -155,8 +157,8 @@ export default function TutorialOverviewPage(props) {
   }, [id, unorderedSequence])
 
   const handleCreateSection = (value) => {
-    var sectionType = "Question";
-    if (value.props.children[1] == "Create Code") {
+    let sectionType = "Question";
+    if (value.props.children[1] === "Create Code") {
       sectionType = "Code"
     }
 
@@ -171,8 +173,7 @@ export default function TutorialOverviewPage(props) {
 
     fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial_section/create', requestOptions)
       .then(response => response.json())
-      .then(data => history.push({
-        pathname: "/tutorial/section/edit/" + data.id,
+      .then(data => navigate("/tutorial/section/edit/" + data.id, {
         state: {
           tutorial_type: sectionType,
         }
@@ -211,7 +212,7 @@ export default function TutorialOverviewPage(props) {
     fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial/delete/' + id, requestOptions)
       .then(response => {
         if(response.status == 200){
-          history.push("/tutorial")
+          navigate("/tutorial")
         }
       })
   }
@@ -248,21 +249,21 @@ export default function TutorialOverviewPage(props) {
   };
 
   const handleShowTutorial = () => {
-    setStartDatetime(moment(new Date()).format("YYYY-MM-DDTHH:mm"));
-    setEndDatetime(moment(new Date()).format("YYYY-MM-DDTHH:mm"));
+    setStartDatetime(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
+    setEndDatetime(format(new Date(), "yyyy-MM-dd'T'HH:mm"));
     setShowTutorialModal(true);
   }
 
   const handleSaveShowTutorialDate = () => {
     if (!withoutEndDate) {
-      if (moment(endDatetime).isAfter(moment(startDatetime))) {
+      if (isAfter(parseISO(endDatetime), parseISO(startDatetime))) {
         setDateErrorMessage("");
 
         const requestOptions = {
           method: 'POST',
           body: JSON.stringify({ 
-            startDatetime: moment(startDatetime).utcOffset("+0800").format(),
-            endDatetime: moment(endDatetime).utcOffset("+0800").format(),
+            startDatetime: formatInTimeZone(parseISO(startDatetime), 'Asia/Singapore', "yyyy-MM-dd'T'HH:mm:ssXXX"),
+            endDatetime: formatInTimeZone(parseISO(endDatetime), 'Asia/Singapore', "yyyy-MM-dd'T'HH:mm:ssXXX"),
           })
         };
     
@@ -280,7 +281,7 @@ export default function TutorialOverviewPage(props) {
       const requestOptions = {
         method: 'POST',
         body: JSON.stringify({ 
-          startDatetime: moment(startDatetime).utcOffset("+0800").format(),
+          startDatetime: formatInTimeZone(parseISO(startDatetime), 'Asia/Singapore', "yyyy-MM-dd'T'HH:mm:ssXXX"),
           endDatetime: null
         })
       };
@@ -398,11 +399,11 @@ export default function TutorialOverviewPage(props) {
                         }}
                         buttonText={"Create Section"}
                         dropdownList={[
-                          <span className={classes.dropdownDetail}>
+                          <span key="create-code" className={classes.dropdownDetail}>
                             <CodeIcon className={classes.dropdownIcon}/>
                             Create Code
                           </span>,
-                          <span className={classes.dropdownDetail}>
+                          <span key="create-question" className={classes.dropdownDetail}>
                             <QuestionAnswerIcon className={classes.dropdownIcon}/>
                             Create Question
                           </span>
@@ -430,7 +431,7 @@ export default function TutorialOverviewPage(props) {
                                     >
                                       <div style={{ display: "flex", alignItems: "center"}}>
                                         <a
-                                          onClick={() => history.push("/tutorial/section/edit/" + t.id)}
+                                          onClick={() => navigate("/tutorial/section/edit/" + t.id)}
                                           style={{color: "inherit", cursor: "pointer"}}
                                         >
                                           {t.name}
@@ -519,7 +520,7 @@ export default function TutorialOverviewPage(props) {
                       shrink: true,
                     }}
                     inputProps={{
-                      onChange: (e) => setStartDatetime(moment(e.target.value).format("YYYY-MM-DDTHH:mm"))
+                      onChange: (e) => setStartDatetime(format(parseISO(e.target.value), "yyyy-MM-dd'T'HH:mm"))
                     }}
                   />
                 </GridItem>
@@ -534,7 +535,7 @@ export default function TutorialOverviewPage(props) {
                       shrink: true,
                     }}
                     inputProps={{
-                      onChange: (e) => setEndDatetime(moment(e.target.value).format("YYYY-MM-DDTHH:mm"))
+                      onChange: (e) => setEndDatetime(format(parseISO(e.target.value), "yyyy-MM-dd'T'HH:mm"))
                     }}
                     disabled={withoutEndDate}
                   />

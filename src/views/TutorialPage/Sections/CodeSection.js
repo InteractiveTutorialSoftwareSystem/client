@@ -1,30 +1,29 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from 'prop-types';
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 
 import Mark from "mark.js";
 
 // core components
 import Button from "components/CustomButtons/Button.js";
-import Grid from '@material-ui/core/Grid';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Chip from '@material-ui/core/Chip';
-import InputAdornment from "@material-ui/core/InputAdornment";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
+import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress';
+import Chip from '@mui/material/Chip';
+import InputAdornment from "@mui/material/InputAdornment";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
 import CustomInput from "components/CustomInput/CustomInput.js";
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import NestedMenuItem from "material-ui-nested-menu-item";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 // material ui icon
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 //dock
 import DockLayout from 'rc-dock';
 import "rc-dock/dist/rc-dock.css";
@@ -40,18 +39,18 @@ import "ace-builds/src-noconflict/theme-github";
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 
-import SearchIcon from '@material-ui/icons/Search';
-import Close from "@material-ui/icons/Close";
-import ErrorIcon from '@material-ui/icons/Error';
-import SettingsIcon from '@material-ui/icons/Settings';
+import SearchIcon from '@mui/icons-material/Search';
+import Close from "@mui/icons-material/Close";
+import ErrorIcon from '@mui/icons-material/Error';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 // Modal
-import Slide from "@material-ui/core/Slide";
+import Slide from "@mui/material/Slide";
 import Modal from 'react-bootstrap/Modal';
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import IconButton from "@material-ui/core/IconButton";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
 import '../../../assets/css/modal.css';
 
 import {decode} from 'html-entities';
@@ -89,7 +88,7 @@ TabPanel.propTypes = {
 const useStyles = makeStyles(styles);
 const Context = React.createContext();
 
-const Transition = React.forwardRef(function Transition(props, ref) {
+const Transition = React.forwardRef((props, ref) => {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
@@ -141,15 +140,15 @@ export default function CodeSection(props) {
 
   const tutorTab = () => {
     // Python Tutor tab contents
-    var id, title, curInstr, language;
+    let id, title, curInstr, language;
     if (props.languageChosen == "python") {
       id = "python-tutor";
       title = "Python Tutor";
       curInstr = "1";
       language = "3";
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         cached: true,
         closable: true,
         content: (
@@ -173,8 +172,8 @@ export default function CodeSection(props) {
       curInstr = "0";
       language = "java";
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         cached: true,
         closable: true,
         content: (
@@ -183,7 +182,7 @@ export default function CodeSection(props) {
               <div className={classes.editorPane}>
                 {value.ide?
                 <a key={value.random} target="_blank"
-                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"}>
+                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"} rel="noreferrer">
                     Link to Java Tutor
                 </a> :
                 <p>No code in Editor panel</p>
@@ -199,8 +198,8 @@ export default function CodeSection(props) {
       curInstr = "0";
       language = "js";
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         cached: true,
         closable: true,
         content: (
@@ -209,7 +208,7 @@ export default function CodeSection(props) {
               <div className={classes.editorPane}>
                 {value.ide?
                 <a key={value.random} target="_blank"
-                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"}>
+                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"} rel="noreferrer">
                     Link to Java Tutor
                 </a> :
                 <p>No code in Editor panel</p>
@@ -407,7 +406,7 @@ export default function CodeSection(props) {
   }, [props.frequentWord])
 
   useEffect(() => {
-    var inputRefObserver = new MutationObserver(function (mutations, me) {
+    const inputRefObserver = new MutationObserver((mutations, me) => {
       if (props.inputIdeRef) {
         props.inputIdeRef.current.editor.setValue(props.input);
         props.inputIdeRef.current.editor.clearSelection();
@@ -422,7 +421,7 @@ export default function CodeSection(props) {
   }, [props.input])
 
   useEffect(() => {
-    var descriptionDiv = document.getElementById("description-preview")
+    const descriptionDiv = document.getElementById("description-preview")
     setDescriptionInnerText(descriptionDiv.innerText.split('\n').filter((elem) => elem != ""))
   }, [props.description])
 
@@ -431,22 +430,22 @@ export default function CodeSection(props) {
     if (!props.consoleIdeRef.current) {
       return
     }
-    var input = "";
+    let input = "";
     if (props.inputIdeRef.current) {
       input = props.inputIdeRef.current.editor.getValue();
     }
-    var ide = props.playbackIdeRef.current.editor.getValue();
+    const ide = props.playbackIdeRef.current.editor.getValue();
     setShowCodeRun(false);
     setRandom(random + 1);
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify({ data: ide, input: input, filename: props.filename })
+      body: JSON.stringify({ data: ide, input, filename: props.filename })
     };
 
     fetch(process.env.REACT_APP_TUTORIAL_URL + '/run_script/' + props.languageChosen, requestOptions)
       .then(response => response.json())
       .then(data => {
-        var newResult = props.consoleIdeRef.current.editor.getValue() + "> " + data.output;
+        let newResult = props.consoleIdeRef.current.editor.getValue() + "> " + data.output;
         if (data.time) {
           newResult += "> Time taken: " + (Math.ceil(data.time * 1000)/1000).toFixed(3) + "s\n";
         }
@@ -459,7 +458,7 @@ export default function CodeSection(props) {
           const sentenceArray = output.split("\n")
           for (const sentence of sentenceArray) {
             if (sentence.includes("error") || sentence.includes("exception")) {
-              var consoleErrorString = ""
+              let consoleErrorString = ""
               for (const word of sentence.split(" ")) {
                 if (props.languageChosen == "python") {
                   if (!word.includes("'")) {
@@ -488,21 +487,21 @@ export default function CodeSection(props) {
     if (!props.consoleIdeRef.current) {
       return
     }
-    var input = "";
+    let input = "";
     if (props.inputIdeRef.current) {
       input = props.inputIdeRef.current.editor.getValue();
     }
-    var ide = practiceIdeRef.current.editor.getValue();
+    const ide = practiceIdeRef.current.editor.getValue();
     setShowCodeRun(false);
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify({ data: ide, input: input, filename: props.filename })
+      body: JSON.stringify({ data: ide, input, filename: props.filename })
     };
 
     fetch(process.env.REACT_APP_TUTORIAL_URL + '/run_script/' + props.languageChosen, requestOptions)
       .then(response => response.json())
       .then(data => {
-        var newResult = props.consoleIdeRef.current.editor.getValue() + "> " + data.output;
+        let newResult = props.consoleIdeRef.current.editor.getValue() + "> " + data.output;
         if (data.time) {
           newResult += "> Time taken: " + (Math.ceil(data.time * 1000)/1000).toFixed(3) + "s\n";
         }
@@ -572,9 +571,9 @@ export default function CodeSection(props) {
 
   function createIdeEvent(i, time) {
     // Handles code and selection playback in the Playback tab
-    var k = props.keystrokes[i];
+    const k = props.keystrokes[i];
 
-    var evt = setTimeout(() => {
+    const evt = setTimeout(() => {
       setCurrentKeystroke(i);
       if (props.playbackIdeRef.current) {
         props.playbackIdeRef.current.editor.clearSelection();
@@ -594,9 +593,9 @@ export default function CodeSection(props) {
 
   function createConsoleEvent(i, time) {
     // Handles code and selection playback in the Console tab
-    var k = props.consoleActions[i];
+    const k = props.consoleActions[i];
     
-    var evt = setTimeout(() => {
+    const evt = setTimeout(() => {
       setCurrentConsoleAction(i);
       if (props.consoleIdeRef.current) {
         props.consoleIdeRef.current.editor.clearSelection();
@@ -616,9 +615,9 @@ export default function CodeSection(props) {
 
   function createConsoleScrollEvent(i, time){
     // Handles vertical scroll in console tab
-    var k = props.consoleScrollActions[i];
+    const k = props.consoleScrollActions[i];
 
-    var evt = setTimeout(() => {
+    const evt = setTimeout(() => {
       if (props.consoleIdeRef.current) {
         props.consoleIdeRef.current.editor.session.setScrollTop(k.scroll);
       }
@@ -629,10 +628,10 @@ export default function CodeSection(props) {
 
   function createInputEvent(i, time) {
     // Handles code and selection playback in the input tab
-    var k = props.inputKeystrokes[i];
+    const k = props.inputKeystrokes[i];
 
     if(k !== undefined){
-      var evt = setTimeout(() => {
+      const evt = setTimeout(() => {
         setCurrentInputKeystroke(i);
         if (props.inputIdeRef.current) {
           props.inputIdeRef.current.editor.clearSelection();
@@ -653,10 +652,10 @@ export default function CodeSection(props) {
 
   function createInputScrollEvent(i, time){
     // Handles vertical scroll playback in input tab
-    var k = props.inputScrollActions[i];
+    const k = props.inputScrollActions[i];
 
     if(k !== undefined){
-      var evt = setTimeout(() => {
+      const evt = setTimeout(() => {
         if (props.inputIdeRef.current) {
           props.inputIdeRef.current.editor.session.setScrollTop(k.scroll);
         }
@@ -668,9 +667,9 @@ export default function CodeSection(props) {
 
   function createLayoutEvent(i, time) {
     // Handles playback layout changes
-    var k = props.layoutActions[i];
+    const k = props.layoutActions[i];
     if(k !== undefined){
-      var evt = setTimeout(() => {
+      const evt = setTimeout(() => {
         props.layoutRef.current.loadLayout(props.layoutActions[i].layout);
         props.layoutRef.current.dockMove(practiceTab(), 'editor', "after-tab")
         props.layoutRef.current.dockMove(props.layoutRef.current.find('editor'), 'practice', "before-tab")
@@ -682,15 +681,15 @@ export default function CodeSection(props) {
 
   function createMarkdownScrollEvent(i, time) {
     // Handles vertical scroll in Description tab
-    var k = props.scrollActions[i];
+    const k = props.scrollActions[i];
 
     if(k !== undefined){
-      var evt = setTimeout(() => {
-        var markdownDivElement = document.getElementById('markdownDiv');
+      const evt = setTimeout(() => {
+        const markdownDivElement = document.getElementById('markdownDiv');
         if (markdownDivElement) {
-          var scrollPercent = k.scroll;
-          var scrollHeight = markdownDivElement.scrollHeight - markdownDivElement.clientHeight;
-          var scrollPosition = scrollPercent * scrollHeight;
+          const scrollPercent = k.scroll;
+          const scrollHeight = markdownDivElement.scrollHeight - markdownDivElement.clientHeight;
+          const scrollPosition = scrollPercent * scrollHeight;
           markdownDivElement.scrollTop = scrollPosition;
         }
       },(k.timestamp - time)/playbackSpeed);
@@ -700,9 +699,9 @@ export default function CodeSection(props) {
   }
   function createEditorScrollEvent(i, time) {
     // Handles vertical scroll in editor 
-    var k = props.editorScrollActions[i];
+    const k = props.editorScrollActions[i];
     if(k !== undefined){
-      var evt = setTimeout(() => {
+      const evt = setTimeout(() => {
         if (props.playbackIdeRef.current) {
           props.playbackIdeRef.current.editor.session.setScrollTop(k.scroll);
         }
@@ -714,9 +713,9 @@ export default function CodeSection(props) {
 
   function createMarkdownSelectEvent(i, time) {
     // Handles selection in Description tab
-    var k = props.selectActions[i];
+    const k = props.selectActions[i];
     if(k !== undefined){
-      var evt = setTimeout(() => {
+      const evt = setTimeout(() => {
         try{
           use(JSON.parse(k.data));
         } catch(e){}
@@ -727,15 +726,15 @@ export default function CodeSection(props) {
   }
 
   function createTranscriptEvent(i, time) {
-    var k = props.transcript[i];
+    const k = props.transcript[i];
     if(k !== undefined){
-      var evt = setTimeout(() => {
+      const evt = setTimeout(() => {
         setCurrentTranscriptText(k.text)
       },(k.timestamp - time)/playbackSpeed);
       playbackEvents.push(evt)
     }
     if (!playState){
-      var evt2 = setTimeout(() => {
+      const evt2 = setTimeout(() => {
         setCurrentTranscriptText("")
       }, (k.endTime - time)/playbackSpeed);
       playbackEvents.push(evt2)
@@ -744,7 +743,7 @@ export default function CodeSection(props) {
 
   function findEle(tagName, innerHTML) {
     // returns DOM element of matching tag name and inner HTML
-    let list = document.getElementsByTagName(tagName);
+    const list = document.getElementsByTagName(tagName);
     for (let i = 0; i < list.length; i++) {
       if (list[i].innerHTML == innerHTML) {
         return list[i];
@@ -754,9 +753,9 @@ export default function CodeSection(props) {
   
   function show(startNode,startIsText,startOffset,endNode,endIsText,endOffset,sP,eP) {
     // select element with window.getSelection
-    var s, e;
+    let s, e;
     if (startIsText) {
-      let childs = sP.childNodes;
+      const childs = sP.childNodes;
       for (let i = 0; i < childs.length; i++) {
         if (childs[i].nodeType == 3 && childs[i].nodeValue == startNode)
           s = childs[i];
@@ -765,7 +764,7 @@ export default function CodeSection(props) {
       s = startNode;
     }
     if (endIsText) {
-      let childs = eP.childNodes;
+      const childs = eP.childNodes;
       for (let i = 0; i < childs.length; i++) {
         if (childs[i].nodeType == 3 && childs[i].nodeValue == endNode)
           e = childs[i];
@@ -773,18 +772,18 @@ export default function CodeSection(props) {
     } else {
       e = startNode;
     }
-    let range = document.createRange();
+    const range = document.createRange();
     range.setStart(s, startOffset);
     range.setEnd(e, endOffset);
   
-    let sel = window.getSelection();
+    const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
   }
   
   function use(obj) {
-    let sP = findEle(obj.startTagName, obj.startHTML);
-    let eP = findEle(obj.endTagName, obj.endHTML);
+    const sP = findEle(obj.startTagName, obj.startHTML);
+    const eP = findEle(obj.endTagName, obj.endHTML);
     show(
       obj.startNode,
       obj.startIsText,
@@ -799,20 +798,20 @@ export default function CodeSection(props) {
 
   function pause() {
     setPlayState(false);
-    for (var i = 0; i < playbackEvents.length; i++) {
+    for (let i = 0; i < playbackEvents.length; i++) {
         clearTimeout(playbackEvents[i]);
     }
     setPlaybackEvents([]);
-    var time = props.player.current.audio.current.currentTime * 1000;
+    const time = props.player.current.audio.current.currentTime * 1000;
     setCurrentTime(time);
     return Promise.resolve(time);
   }
 
   function getCurrentElement(elementArray, time) {
     // return index of elementArray which would be run at given time (it's a binary search) 
-    var bottom = 0;
-    var top = elementArray.length - 1;
-    var mid = 0;
+    let bottom = 0;
+    let top = elementArray.length - 1;
+    let mid = 0;
     while (bottom <= top) {
       mid = Math.floor((bottom + top) / 2);
       if (time < elementArray[mid].timestamp) {
@@ -837,18 +836,18 @@ export default function CodeSection(props) {
   function seeked() {
     // Set respective states of playback when Media Player is seeked
     // Continue to play from seeked if Media Player was playing when seeked
-    var currentPlayState = playState;
+    const currentPlayState = playState;
     props.player.current.audio.current.pause();
 
     pause()
     .then((time)=>{
-      var keystroke = getCurrentElement(props.keystrokes, time);
+      const keystroke = getCurrentElement(props.keystrokes, time);
       setCurrentKeystroke(keystroke);
       createIdeEvent(keystroke, time);
-      var consoleAction = getCurrentElement(props.consoleActions, time);
+      const consoleAction = getCurrentElement(props.consoleActions, time);
       setCurrentConsoleAction(consoleAction);
       createConsoleEvent(consoleAction, time);
-      var consoleScrollAction = getCurrentElement(props.consoleScrollActions, time);
+      const consoleScrollAction = getCurrentElement(props.consoleScrollActions, time);
       setCurrentConsoleScrollAction(consoleScrollAction);
       createConsoleScrollEvent(consoleScrollAction, time);
 
@@ -859,19 +858,19 @@ export default function CodeSection(props) {
       } else{
         var inputKeystroke = ""
       }
-      var inputScrollAction = getCurrentElement(props.inputScrollActions, time);
+      const inputScrollAction = getCurrentElement(props.inputScrollActions, time);
       setCurrentInputScrollAction(inputScrollAction);
       createInputScrollEvent(inputScrollAction, time);
-      var layoutAction = getCurrentElement(props.layoutActions, time);
+      const layoutAction = getCurrentElement(props.layoutActions, time);
       setCurrentLayoutAction(layoutAction);
       createLayoutEvent(layoutAction, time);
-      var selectAction = getCurrentElement(props.selectActions, time);
+      const selectAction = getCurrentElement(props.selectActions, time);
       setCurrentSelectAction(selectAction);
       createMarkdownSelectEvent(selectAction, time);
-      var scrollAction = getCurrentElement(props.scrollActions, time);
+      const scrollAction = getCurrentElement(props.scrollActions, time);
       setCurrentScrollAction(scrollAction);
       createMarkdownScrollEvent(scrollAction, time);
-      var editorScrollAction = getCurrentElement(props.editorScrollActions, time);
+      const editorScrollAction = getCurrentElement(props.editorScrollActions, time);
       setCurrentEditorScrollAction(editorScrollAction);
       createEditorScrollEvent(editorScrollAction, time);
 
@@ -937,8 +936,8 @@ export default function CodeSection(props) {
   }
 
   const handleChooseAudioResult = (time) => {
-    var context = document.querySelector("#markdownDiv");
-    var instance = new Mark(context);
+    const context = document.querySelector("#markdownDiv");
+    const instance = new Mark(context);
     instance.unmark();
     setShowClearSearch(false);
     props.setShowSearchModal(false);
@@ -954,23 +953,23 @@ export default function CodeSection(props) {
   const handleChooseDescriptionResult = (i) => {
     props.setShowSearchModal(false);
 
-    var counter = []
-    var startIndex;
+    const counter = []
+    let startIndex;
     const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    var current = descriptionSearchOccurence.slice(0, i);
+    const current = descriptionSearchOccurence.slice(0, i);
     if (current.length != 0) {
       startIndex = current.reduce(reducer);
     } else {
       startIndex = 0
     }
     
-    for (var j = startIndex; j < startIndex + descriptionSearchOccurence[i] ; j++) {
+    for (let j = startIndex; j < startIndex + descriptionSearchOccurence[i] ; j++) {
       counter.push(j)
     }
 
-    var currentCounter = 0;
-    var options = {
-      filter: function() {
+    let currentCounter = 0;
+    const options = {
+      filter() {
         currentCounter++;
         if (counter.includes(currentCounter - 1)) {
           return true;
@@ -978,20 +977,20 @@ export default function CodeSection(props) {
           return false;
         }
       },
-      "each": function(node){
+      "each"(node){
         node.scrollIntoView({block: "center"})
       },
     }
-    var context = document.querySelector("#markdownDiv");
-    var instance = new Mark(context);
+    const context = document.querySelector("#markdownDiv");
+    const instance = new Mark(context);
     instance.unmark();
     instance.mark(searchField, options);
     setShowClearSearch(true);
   }
 
   const handleClearDescriptionSearch = () => {
-    var context = document.querySelector("#markdownDiv");
-    var instance = new Mark(context);
+    const context = document.querySelector("#markdownDiv");
+    const instance = new Mark(context);
     instance.unmark();
     setShowClearSearch(false);
   }
@@ -1002,16 +1001,16 @@ export default function CodeSection(props) {
         {/* Body */}
         <Context.Provider
           value={{
-            "showCodeRun": showCodeRun,
+            showCodeRun,
             "description": props.description,
-            "ide": ide,
+            ide,
             "filename": props.filename,
-            "random": random,
-            "playbackCursor": playbackCursor,
-            "practiceCursor": practiceCursor,
-            "consoleError": consoleError,
+            random,
+            playbackCursor,
+            practiceCursor,
+            consoleError,
             "setShowSearchModal": props.setShowSearchModal,
-            "showClearSearch": showClearSearch
+            showClearSearch
           }}
         >
         <DockLayout
@@ -1059,7 +1058,7 @@ export default function CodeSection(props) {
                     </Grid>
                   </Grid>
                 </MenuItem>
-                <NestedMenuItem
+                <MenuItem
                   label="Playback speed"
                   parentMenuOpen={true}
                 >
@@ -1078,7 +1077,7 @@ export default function CodeSection(props) {
                       {val}
                       </MenuItem>
                   )}
-                </NestedMenuItem>
+                </MenuItem>
               </Menu>
             </div>
             ]}

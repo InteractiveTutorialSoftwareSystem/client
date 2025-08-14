@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { useAuth } from "../../auth";
-import { Redirect } from "react-router-dom";
-import { GoogleLogin } from 'react-google-login';
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import Snackbar from '@material-ui/core/Snackbar';
-import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import Email from "@material-ui/icons/Email";
-import People from "@material-ui/icons/People";
+import { Navigate, useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import InputAdornment from "@mui/material/InputAdornment";
+import Snackbar from '@mui/material/Snackbar';
+import Icon from "@mui/material/Icon";
+// @mui/icons-material
+import Email from "@mui/icons-material/Email";
+import People from "@mui/icons-material/People";
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -35,6 +35,7 @@ const useStyles = makeStyles(styles);
 export default function LoginPage(props) {
   const classes = useStyles();
   const { ...rest } = props;
+  const navigate = useNavigate();
 
   const [role, setRole] = React.useState("learner");
   const [name, setName] = useState('');
@@ -65,9 +66,9 @@ export default function LoginPage(props) {
 
   const handlePasswordChange = (e) => {
     // Handles password input field change and conducts password check
-    var newPassword = e.target.value;
+    const newPassword = e.target.value;
     setPassword(newPassword);
-    var flags = 0;
+    let flags = 0;
     if (newPassword.length < 8) {
       setLengthClass(false);
       flags += 1;
@@ -128,15 +129,18 @@ export default function LoginPage(props) {
     e.preventDefault();
     if (name && email && password && repassword && role) {
       if (password === repassword) {
-        let opts = {
-          'name': name,
-          'email': email,
-          'password': password,
-          'repassword': repassword,
-          'role': role,
+        const opts = {
+          name,
+          email,
+          password,
+          repassword,
+          role,
         };
         fetch(process.env.REACT_APP_AUTH_URL + '/auth/register', {
           method: 'post',
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify(opts)
         }).then(r => {
           if (r.ok) {
@@ -153,7 +157,7 @@ export default function LoginPage(props) {
                 setName("");
                 setPassword("");
                 setRepassword("");
-                setTimeout(window.location.href='/login', 3000);
+                setTimeout(() => navigate('/login'), 3000);
               }
             );
           } else {
@@ -165,8 +169,11 @@ export default function LoginPage(props) {
             );
           }
         })
-          
-        ;
+        .catch(error => {
+          console.error('Registration error:', error);
+          setErrorMsg("Network error. Please check your connection and try again.");
+          setErrorOpen(true);
+        });
       } else {
         setErrorMsg("Password Mismatch.");
         setErrorOpen(true);
@@ -177,13 +184,16 @@ export default function LoginPage(props) {
     }
   }
 
-  const googleRegister = (googleData) => {
+  const googleRegister = (credentialResponse) => {
     // Handles Google registration when Google setup successful
     fetch(process.env.REACT_APP_AUTH_URL + '/oauth/register', {
       method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        'token': googleData.tokenId,
-        'role': role,
+        'token': credentialResponse.credential,
+        role,
       })
     }).then(r => {
       if (r.ok) {
@@ -200,7 +210,7 @@ export default function LoginPage(props) {
             setName("");
             setPassword("");
             setRepassword("");
-            setTimeout(window.location.href='/login', 3000);
+            setTimeout(() => navigate('/login'), 3000);
           }
         );
       } else {
@@ -224,7 +234,7 @@ export default function LoginPage(props) {
   }
 
   return (
-    logged?<Redirect to='/tutorial' />:
+    logged?<Navigate to='/tutorial' />:
     <div>
       <Header
         absolute
@@ -393,23 +403,16 @@ export default function LoginPage(props) {
                   </CardFooter>
                   <CardFooter className={classes.cardFooter}>
                     <GoogleLogin
-                      clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                      render={(renderProps) => (
-                        <Button id="googleButton" color="github" onClick={renderProps.onClick} disabled={renderProps.disabled} fullWidth={true}>
-                          <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
-                            <g fill="#000" fillRule="evenodd">
-                              <path d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z" fill="#EA4335"></path>
-                              <path d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z" fill="#4285F4"></path>
-                              <path d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9.008 9.008 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z" fill="#FBBC05"></path>
-                              <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.97 13.04C2.45 15.98 5.48 18 9 18z" fill="#34A853"></path>
-                              <path fill="none" d="M0 0h18v18H0z"></path>
-                            </g>
-                          </svg> Register via Google
-                        </Button>
-                      )}
-                      buttonText="Login via Google"
                       onSuccess={googleRegister}
-                      onFailure={onFailure}
+                      onError={(error) => {
+                        setErrorMsg("Google Registration failed");
+                        setErrorOpen(true);
+                      }}
+                      useOneTap
+                      theme="outline"
+                      size="large"
+                      text="signup_with"
+                      shape="rectangular"
                     />
                   </CardFooter>
                 </form>

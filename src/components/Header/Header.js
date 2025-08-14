@@ -3,16 +3,15 @@ import React from "react";
 import classNames from "classnames";
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
-import Hidden from "@material-ui/core/Hidden";
-import Drawer from "@material-ui/core/Drawer";
-// @material-ui/icons
-import Menu from "@material-ui/icons/Menu";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Drawer from "@mui/material/Drawer";
+// @mui/icons-material
+import Menu from "@mui/icons-material/Menu";
 // core components
 import styles from "assets/jss/material-kit-react/components/headerStyle.js";
 
@@ -64,45 +63,30 @@ export default function Header(props) {
   return (
     <AppBar className={appBarClasses}>
       <Toolbar className={classes.container}>
-        {leftLinks !== undefined ? brandComponent : null}
-        <div className={classes.flex}>
-          {leftLinks !== undefined ? (
-            <Hidden smDown implementation="css">
-              {leftLinks}
-            </Hidden>
-          ) : (
-            brandComponent
-          )}
-        </div>
-        <Hidden smDown implementation="css">
-          {rightLinks}
-        </Hidden>
-        <Hidden mdUp>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerToggle}
-          >
-            <Menu />
-          </IconButton>
-        </Hidden>
-      </Toolbar>
-      <Hidden mdUp implementation="js">
-        <Drawer
-          variant="temporary"
-          anchor={"right"}
-          open={mobileOpen}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-          onClose={handleDrawerToggle}
+        <div style={{width: '48px'}}></div>
+        {brandComponent}
+        <IconButton
+          color="inherit"
+          aria-label="open drawer"
+          onClick={handleDrawerToggle}
         >
-          <div className={classes.appResponsive}>
-            {leftLinks}
-            {rightLinks}
-          </div>
-        </Drawer>
-      </Hidden>
+          <Menu />
+        </IconButton>
+      </Toolbar>
+      <Drawer
+        variant="temporary"
+        anchor={"right"}
+        open={mobileOpen}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        onClose={handleDrawerToggle}
+      >
+        <div className={classes.appResponsive}>
+          {leftLinks}
+          {rightLinks}
+        </div>
+      </Drawer>
     </AppBar>
   );
 }

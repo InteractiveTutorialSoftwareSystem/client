@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 
 import Quiz from 'react-quiz-component';
 import '../../../assets/css/questionStyle.css';

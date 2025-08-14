@@ -1,8 +1,8 @@
 /*eslint-disable*/
 import React from "react";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-// @material-ui/icons
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+// @mui/icons-material
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";

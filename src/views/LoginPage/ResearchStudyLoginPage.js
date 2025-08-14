@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { login, useAuth } from "../../auth";
-import { useHistory, Redirect } from "react-router-dom";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import Snackbar from '@material-ui/core/Snackbar';
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
+import { useNavigate, Navigate } from "react-router-dom";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import Snackbar from '@mui/material/Snackbar';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -30,7 +30,7 @@ export default function ResearchStudyLoginPage(props) {
   const classes = useStyles();
   const { ...rest } = props;
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [open, setOpen] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState('Please try again');
@@ -54,15 +54,18 @@ export default function ResearchStudyLoginPage(props) {
     setBackdropOpen(true);
     fetch(process.env.REACT_APP_AUTH_URL + '/guest/login', {
       method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({'role': e.currentTarget.getAttribute('data-role')})
     }).then(r => r.json())
       .then(token => {
         if (token.access_token){
           login(token);
           if (token.role == "author") {
-            history.push({pathname: "/tutorial"})
+            navigate("/tutorial")
           } else if (token.role == "learner") {
-            history.push({pathname: "/tutorial",})
+            navigate("/tutorial")
           }
         }
         else {
@@ -73,7 +76,7 @@ export default function ResearchStudyLoginPage(props) {
   }
 
   return (
-    logged?<Redirect to='/tutorial' />:
+    logged?<Navigate to='/tutorial' />:
     <div>
       <Header
         absolute

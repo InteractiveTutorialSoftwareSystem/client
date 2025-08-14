@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+import { useParams, useNavigate } from "react-router-dom";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 
 // core components
 import CodeSection from './Sections/CodeSection.js';
@@ -9,19 +9,19 @@ import QuestionSection from './Sections/QuestionSection.js';
 
 import SideBar from "components/SideBar/SideBar.js";
 import Button from "components/CustomButtons/Button.js";
-import Hidden from '@material-ui/core/Hidden';
-import Grid from '@material-ui/core/Grid';
-import Tooltip from '@material-ui/core/Tooltip';
+import Hidden from '@mui/material/Hidden';
+import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
 import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 
 // material ui icon
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import ViewCompactIcon from '@material-ui/icons/ViewCompact';
-import SaveIcon from '@material-ui/icons/Save';
-import RefreshIcon from '@material-ui/icons/Refresh';
-import SearchIcon from '@material-ui/icons/Search';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ViewCompactIcon from '@mui/icons-material/ViewCompact';
+import SaveIcon from '@mui/icons-material/Save';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import SearchIcon from '@mui/icons-material/Search';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
 // tour
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
@@ -35,6 +35,7 @@ const useStyles = makeStyles(styles);
 export default function TutorialPage(props) {
   const { id, pid } = useParams();
   const classes = useStyles();
+  const navigate = useNavigate();
 
   const layoutRef = useRef(null);
   const inputIdeRef = useRef(null);
@@ -98,11 +99,11 @@ export default function TutorialPage(props) {
       spotlightClicks: true,
     },
     {
-      content: <h4>This is the code pane. The author's recording will playback in the <b>Playback</b> tab. You can practice on your own in the <b>Practice</b> tab.</h4>,
+      content: <h4>This is the code pane. The author&apos;s recording will playback in the <b>Playback</b> tab. You can practice on your own in the <b>Practice</b> tab.</h4>,
       target: '.dock-box.dock-vbox > .dock-panel > .dock.dock-top',
     },
     {
-      content: <h4>Let us now try to print some inputs. In the <b>Input</b> tab, we see that <code>"python"</code> is the first input and <code>"java"</code> is the second input.</h4>,
+      content: <h4>Let us now try to print some inputs. In the <b>Input</b> tab, we see that <code>&quot;python&quot;</code> is the first input and <code>&quot;java&quot;</code> is the second input.</h4>,
       target: '.dock-box.dock-vbox > .dock-box.dock-hbox > .dock-panel > .dock.dock-top',
     },
     {
@@ -309,10 +310,15 @@ export default function TutorialPage(props) {
             setInputKeystrokes(JSON.parse(JSON.parse(data.inputKeystrokes)))
             setInputScrollActions(JSON.parse(JSON.parse(data.inputScrollAction)))
             if (data.frequent_word) {
-              const frequentWordData = eval(data.frequent_word).map((word, i) => ({
-                key: i, label: word
-              }))
-              setFrequentWord(frequentWordData);
+              try {
+                const frequentWordData = JSON.parse(data.frequent_word).map((word, i) => ({
+                  key: i, label: word
+                }))
+                setFrequentWord(frequentWordData);
+              } catch (error) {
+                console.error('Error parsing frequent_word data:', error);
+                setFrequentWord([]);
+              }
             }
 
             if (data.recording != null) {
@@ -382,12 +388,12 @@ export default function TutorialPage(props) {
 
   const goPrev = () => {
     // Directs learner to previous page
-    window.location.href = "/tutorial/"+id+"/"+(parseInt(pid)-1);
+    navigate(`/tutorial/${id}/${parseInt(pid)-1}`);
   }
 
   const goNext = () => {
     // Directs learner to next page
-    window.location.href = "/tutorial/"+id+"/"+(parseInt(pid)+1);
+    navigate(`/tutorial/${id}/${parseInt(pid)+1}`);
   }
 
   useEffect(() => {
@@ -406,7 +412,7 @@ export default function TutorialPage(props) {
   }, []);
 
   const saveLayout = () => {
-    var newLayout = layoutRef.current.saveLayout();
+    const newLayout = layoutRef.current.saveLayout();
     setLearnerLayout(newLayout);
 
     const saveDetails = {

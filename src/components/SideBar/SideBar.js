@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 
-import Drawer from '@material-ui/core/Drawer';
+import Drawer from '@mui/material/Drawer';
 import HeaderLinks from "components/Header/HeaderLinks.js";
 import Button from "components/CustomButtons/Button.js";
 import styles from "assets/jss/material-kit-react/components/sideBarStyle.js";
-import IconButton from "@material-ui/core/IconButton";
-import Menu from "@material-ui/icons/Menu";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/icons-material/Menu";
 
 const useStyles = makeStyles(styles);
 

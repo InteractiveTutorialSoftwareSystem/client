@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+import { useNavigate } from "react-router-dom";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -14,7 +14,7 @@ import CardFooter from "components/Card/CardFooter.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 
-import Snackbar from '@material-ui/core/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from "components/Snackbar/SnackbarContent.js";
 
 import styles from "assets/jss/material-kit-react/views/createTutorialPage.js";
@@ -24,11 +24,11 @@ const useStyles = makeStyles(styles);
 
 export default function CreateTutorialPage(props) {
   const [cardAnimaton, setCardAnimation] = React.useState("cardHidden");
-  setTimeout(function () {
+  setTimeout(() => {
     setCardAnimation("");
   }, 700);
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const languageList = ["python", "java", "javascript"]
   const { ...rest } = props;
   
@@ -61,7 +61,7 @@ export default function CreateTutorialPage(props) {
   
       fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial/create', requestOptions)
         .then(response => response.json())
-        .then(data => history.push("/tutorial/overview/" + data.id))
+        .then(data => navigate("/tutorial/overview/" + data.id))
     }
     
   }

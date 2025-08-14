@@ -4,10 +4,10 @@ import classNames from "classnames";
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
 
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 // core components
 import GridContainer from "components/Grid/GridContainer.js";
@@ -41,7 +41,7 @@ export default function NavPills(props) {
       centered={alignCenter}
     >
       {tabs.map((prop, key) => {
-        var icon = {};
+        const icon = {};
         if (prop.tabIcon !== undefined) {
           icon["icon"] = <prop.tabIcon className={classes.tabIcon} />;
         }

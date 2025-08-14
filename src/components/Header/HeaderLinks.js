@@ -1,11 +1,12 @@
 /*eslint-disable*/
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { logout, useAuth } from "../../auth";
 
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 
 // core components
 import Button from "components/CustomButtons/Button.js";
@@ -14,6 +15,7 @@ import styles, { sideHeaderLink } from "assets/jss/material-kit-react/components
 
 
 export default function HeaderLinks(props) {
+  const navigate = useNavigate();
   var useStyles = makeStyles(styles)
   if (props.side == true) {
     useStyles = makeStyles(sideHeaderLink);
@@ -46,7 +48,7 @@ export default function HeaderLinks(props) {
           className={classes.navLink}
           onClick={() => {
             logout();
-            window.location.href='/login';
+            navigate('/login');
           }}
         >
           Logout

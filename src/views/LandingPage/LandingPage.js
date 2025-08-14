@@ -1,10 +1,10 @@
 import React from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
 
-// @material-ui/icons
+// @mui/icons-material
 
 // core components
 import Header from "components/Header/Header.js";

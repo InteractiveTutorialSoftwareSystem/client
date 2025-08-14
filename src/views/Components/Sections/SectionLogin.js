@@ -1,11 +1,11 @@
 import React from "react";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import People from "@material-ui/icons/People";
-import Email from "@material-ui/icons/Email";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import InputAdornment from "@mui/material/InputAdornment";
+import Icon from "@mui/material/Icon";
+// @mui/icons-material
+import People from "@mui/icons-material/People";
+import Email from "@mui/icons-material/Email";
 // core components
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";

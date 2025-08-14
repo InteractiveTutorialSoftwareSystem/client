@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { login, useAuth } from "../../auth";
-import { useHistory, Redirect } from "react-router-dom";
-import { GoogleLogin } from 'react-google-login';
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import Snackbar from '@material-ui/core/Snackbar';
-import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import Email from "@material-ui/icons/Email";
+import { useNavigate, Navigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import InputAdornment from "@mui/material/InputAdornment";
+import Snackbar from '@mui/material/Snackbar';
+import Icon from "@mui/material/Icon";
+// @mui/icons-material
+import Email from "@mui/icons-material/Email";
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -35,13 +35,14 @@ export default function LoginPage(props) {
   const classes = useStyles();
   const { ...rest } = props;
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [role, setRole] = React.useState("learner");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [open, setOpen] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState('Please try again');
+  const [loading, setLoading] = React.useState(false);
 
   const [logged] = useAuth();
 
@@ -68,28 +69,44 @@ export default function LoginPage(props) {
     // Handles form submission login
     e.preventDefault();
     if (email && password && role) {
-      let opts = {
-        'email': email,
-        'password': password,
-        'role': role,
+      setLoading(true);
+      const opts = {
+        email,
+        password,
+        role,
       };
       fetch(process.env.REACT_APP_AUTH_URL + '/auth/login', {
         method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(opts)
-      }).then(r => r.json())
+      }).then(r => {
+        if (!r.ok) {
+          throw new Error(`HTTP error! status: ${r.status}`);
+        }
+        return r.json();
+      })
         .then(token => {
+          setLoading(false);
           if (token.access_token){
             login(token);
             if (token.role == "author") {
-              history.push({pathname: "/tutorial"})
+              navigate("/tutorial")
             } else if (token.role == "learner") {
-              history.push({pathname: "/tutorial",})
+              navigate("/tutorial")
             }
           }
           else {
-            setErrorMsg(token.message);
+            setErrorMsg(token.message || "Login failed");
             setOpen(true);
           }
+      })
+      .catch(error => {
+        setLoading(false);
+        console.error('Login error:', error);
+        setErrorMsg("Network error. Please check your connection and try again.");
+        setOpen(true);
       });
     } else {
       setErrorMsg("Please input all credentials");
@@ -97,28 +114,41 @@ export default function LoginPage(props) {
     }
   }
 
-  const googleLogin = (googleData) => {
+  const googleLogin = (credentialResponse) => {
     // Handles Google login when Google setup successful
     fetch(process.env.REACT_APP_AUTH_URL + '/oauth/login', {
       method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        'token': googleData.tokenId,
-        'role': role,
+        'token': credentialResponse.credential,
+        role,
       })
-    }).then(r => r.json())
+    }).then(r => {
+      if (!r.ok) {
+        throw new Error(`HTTP error! status: ${r.status}`);
+      }
+      return r.json();
+    })
       .then(token => {
         if (token.access_token){
           login(token);
           if (token.role == "author") {
-            history.push({pathname: "/tutorial"})
+            navigate("/tutorial")
           } else if (token.role == "learner") {
-            history.push({pathname: "/tutorial"})
+            navigate("/tutorial")
           }
         }
         else {
-          setErrorMsg("Google Login failed");
+          setErrorMsg(token.message || "Google Login failed");
           setOpen(true);
         }
+    })
+    .catch(error => {
+      console.error('Google login error:', error);
+      setErrorMsg("Google login failed. Please try again.");
+      setOpen(true);
     })
   };
 
@@ -136,26 +166,39 @@ export default function LoginPage(props) {
     e.preventDefault();
     fetch(process.env.REACT_APP_AUTH_URL + '/guest/login', {
       method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({'role': e.currentTarget.getAttribute('data-role')})
-    }).then(r => r.json())
+    }).then(r => {
+      if (!r.ok) {
+        throw new Error(`HTTP error! status: ${r.status}`);
+      }
+      return r.json();
+    })
       .then(token => {
         if (token.access_token){
           login(token);
           if (token.role == "author") {
-            history.push({pathname: "/tutorial"})
+            navigate("/tutorial")
           } else if (token.role == "learner") {
-            history.push({pathname: "/tutorial",})
+            navigate("/tutorial")
           }
         }
         else {
-          setErrorMsg(token.message);
+          setErrorMsg(token.message || "Guest login failed");
           setOpen(true);
         }
+    })
+    .catch(error => {
+      console.error('Guest login error:', error);
+      setErrorMsg("Guest login failed. Please try again.");
+      setOpen(true);
     });
   }
 
   return (
-    logged?<Redirect to='/tutorial' />:
+    logged?<Navigate to='/tutorial' />:
     <div>
       <Header
         absolute
@@ -173,7 +216,7 @@ export default function LoginPage(props) {
         }}
       >
         <div className={classes.container}>
-          <GridContainer justify="center">
+          <GridContainer justify="center" className={classes.gridContainer}>
             <GridItem xs={12} sm={12} md={4}>
               <Card>
                 <form className={classes.form}>
@@ -255,29 +298,22 @@ export default function LoginPage(props) {
                     />
                   </CardBody>
                   <CardFooter className={classes.cardFooter}>
-                    <Button color="github" onClick={onSubmitClick} type="submit" fullWidth={true}>
-                      Login with credentials
+                    <Button color="github" onClick={onSubmitClick} type="submit" fullWidth={true} disabled={loading}>
+                      {loading ? 'Logging in...' : 'Login with credentials'}
                     </Button>
                   </CardFooter>
                   <CardFooter className={classes.cardFooter}>
                     <GoogleLogin
-                      clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                      render={(renderProps) => (
-                        <Button id="googleButton" color="github" onClick={renderProps.onClick} disabled={renderProps.disabled} fullWidth={true}>
-                          <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
-                            <g fill="#000" fillRule="evenodd">
-                              <path d="M9 3.48c1.69 0 2.83.73 3.48 1.34l2.54-2.48C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.91 2.26C4.6 5.05 6.62 3.48 9 3.48z" fill="#EA4335"></path>
-                              <path d="M17.64 9.2c0-.74-.06-1.28-.19-1.84H9v3.34h4.96c-.1.83-.64 2.08-1.84 2.92l2.84 2.2c1.7-1.57 2.68-3.88 2.68-6.62z" fill="#4285F4"></path>
-                              <path d="M3.88 10.78A5.54 5.54 0 0 1 3.58 9c0-.62.11-1.22.29-1.78L.96 4.96A9.008 9.008 0 0 0 0 9c0 1.45.35 2.82.96 4.04l2.92-2.26z" fill="#FBBC05"></path>
-                              <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.84-2.2c-.76.53-1.78.9-3.12.9-2.38 0-4.4-1.57-5.12-3.74L.97 13.04C2.45 15.98 5.48 18 9 18z" fill="#34A853"></path>
-                              <path fill="none" d="M0 0h18v18H0z"></path>
-                            </g>
-                          </svg> Login via Google
-                        </Button>
-                      )}
-                      buttonText="Login via Google"
                       onSuccess={googleLogin}
-                      onFailure={onFailure}
+                      onError={(error) => {
+                        setErrorMsg("Google Login failed");
+                        setOpen(true);
+                      }}
+                      useOneTap
+                      theme="outline"
+                      size="large"
+                      text="signin_with"
+                      shape="rectangular"
                     />
                   </CardFooter>
                   <CardFooter className={classes.cardFooter}>

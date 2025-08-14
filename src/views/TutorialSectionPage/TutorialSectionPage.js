@@ -1,27 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, Link, useHistory } from "react-router-dom";
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from '@material-ui/core/Grid';
-import Tooltip from '@material-ui/core/Tooltip';
-import Hidden from '@material-ui/core/Hidden';
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
+import Hidden from '@mui/material/Hidden';
 // core components
 import CustomInput from "components/CustomInput/CustomInput.js";
 import SideBar from "components/SideBar/SideBar.js";
 import Button from "components/CustomButtons/Button.js";
 // material ui icon
-import EditIcon from '@material-ui/icons/Edit';
-import CheckIcon from '@material-ui/icons/Check';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import TextRotateUpIcon from '@material-ui/icons/TextRotateUp';
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import TextRotateUpIcon from '@mui/icons-material/TextRotateUp';
 
 import QuestionSection from './Sections/QuestionSection.js';
 import CodeSection from './Sections/CodeSection.js';
 
 import styles from "assets/jss/material-kit-react/views/tutorialSectionPage.js";
 
-import {sampleQuestion} from './Sections/sample.json'
+import sampleData from './Sections/sample.json'
+const {sampleQuestion} = sampleData;
 
 // tour
 import Joyride, {STATUS} from 'react-joyride';
@@ -31,8 +32,8 @@ const useStyles = makeStyles(styles);
 export default function TutorialPage(props) {
   const { id } = useParams();
   const classes = useStyles();
-  const { ...rest } = props;
-  const history = useHistory();
+  // Props destructured for component usage
+  const navigate = useNavigate();
 
   const layoutRef = useRef(null);
 
@@ -71,7 +72,7 @@ export default function TutorialPage(props) {
       target: '#section-name-div'
     },
     {
-      content: <h4>You can upload a markdown (.md) file for this tutorial section's description.</h4>,
+      content: <h4>You can upload a markdown (.md) file for this tutorial section&apos;s description.</h4>,
       target: '#upload-button'
     },
     {
@@ -85,7 +86,7 @@ export default function TutorialPage(props) {
       placement: 'right'
     },
     {
-      content: <h4>Scrolling and text selection will be recorded. Utilize these to better direct the learner's attention.</h4>,
+      content: <h4>Scrolling and text selection will be recorded. Utilize these to better direct the learner&apos;s attention.</h4>,
       target: '.dock.dock-top',
       placement: 'right'
     },
@@ -104,7 +105,7 @@ export default function TutorialPage(props) {
       target: '#search-button',
     },
     {
-      content: <h4>Once you're all set, click this button to start recording!</h4>,
+      content: <h4>Once you&apos;re all set, click this button to start recording!</h4>,
       target: '#start-recording-button',
       spotlightClicks: false,
     },
@@ -122,7 +123,7 @@ export default function TutorialPage(props) {
       content: 
       <div>
         <h4>This brings us to the end of the tour.</h4>
-        <h5>To aid in learning, do refer to this <a href="https://waterbearlearning.com/mayers-principles-multimedia-learning/" target="_blank"><u>link</u></a> for more information on Mayer's Principles of Multimedia Learning.</h5>
+        <h5>To aid in learning, do refer to this <a href="https://waterbearlearning.com/mayers-principles-multimedia-learning/" target="_blank" rel="noreferrer"><u>link</u></a> for more information on Mayer&apos;s Principles of Multimedia Learning.</h5>
       </div>,
       target: 'body',
       placement: 'center',
@@ -217,7 +218,7 @@ export default function TutorialPage(props) {
 
   const handleJoyrideCallback = (data) => {
     // Code for tour
-    const { status, type } = data;
+    const { status } = data;
     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
@@ -233,7 +234,7 @@ export default function TutorialPage(props) {
         body: JSON.stringify({
           name: tutorialSectionTitle,
           language: languageChosen,
-          description: description,
+          description,
           code_content: ideEditted,
           code_input: inputEditted,
         })
@@ -241,20 +242,20 @@ export default function TutorialPage(props) {
   
       fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial_section/update/' + id, requestOptions)
         .then(response => response.json())
-        .then(data => history.push("/tutorial/overview/" + data.tutorial_id));
+        .then(data => navigate("/tutorial/overview/" + data.tutorial_id));
     } else {
       const requestOptions = {
         method: 'POST',
         body: JSON.stringify({ 
           name: tutorialSectionTitle,
-          question: question,
+          question,
         })
       };
   
       fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial_section/update/' + id, requestOptions)
         .then(response => {
           if (response.status == 200) {
-            history.push("/tutorial/overview/" + tutorialId)
+            navigate("/tutorial/overview/" + tutorialId)
           }
         })
     }

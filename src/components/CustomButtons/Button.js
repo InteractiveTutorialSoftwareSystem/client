@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 
-// @material-ui/core components
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import Button from "@material-ui/core/Button";
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import Button from "@mui/material/Button";
 
 // core components
 
@@ -53,6 +53,8 @@ const RegularButton = React.forwardRef((props, ref) => {
     </Button>
   );
 });
+
+RegularButton.displayName = 'RegularButton';
 
 RegularButton.propTypes = {
   color: PropTypes.oneOf([

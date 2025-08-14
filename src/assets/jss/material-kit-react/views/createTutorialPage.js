@@ -1,4 +1,4 @@
-import { Autorenew } from "@material-ui/icons";
+import { Autorenew } from "@mui/icons-material";
 import { container } from "assets/jss/material-kit-react.js";
 
 const createTutorialStyle = {

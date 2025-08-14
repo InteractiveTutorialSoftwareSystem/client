@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
-// @material-ui/core components
-import { makeStyles, withStyles } from "@material-ui/core/styles";
-import List from '@material-ui/core/List';
-import MuiListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
-// @material-ui/icons
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import { useNavigate } from "react-router-dom";
+// @mui/material components
+import { makeStyles, withStyles } from "@mui/styles";
+import List from '@mui/material/List';
+import MuiListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
+import Avatar from '@mui/material/Avatar';
+// @mui/icons-material
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -42,14 +42,14 @@ export default function AllTutorialsPage(props) {
   })(MuiListItem);
 
   const TutorialCard = ({id, language, name, sequence, user_name, user_picture, last_page}) => {
-    var lessonNoun = "lessons";
-    if (sequence == 1) {
+    let lessonNoun = "lessons";
+    if (sequence === 1) {
       lessonNoun = "lesson";
     }
-    var page;
-    last_page > sequence? last_page = sequence : last_page = last_page;
-    last_page == 0? page = 1 : page = last_page;
-    var redirectUrl = "/tutorial/" + id + "/" + page
+    let page;
+    const normalizedLastPage = last_page > sequence ? sequence : last_page;
+    page = normalizedLastPage === 0 ? 1 : normalizedLastPage;
+    let redirectUrl = "/tutorial/" + id + "/" + page
     if (props.role == "author") {
       redirectUrl = "/tutorial/overview/" + id
     }
@@ -74,7 +74,7 @@ export default function AllTutorialsPage(props) {
   
   const { ...rest } = props;
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedLanguage, setSelectedLanguage] = useState(["python", "java", "javascript"]);
   const [openLanguage, setOpenLanguage] = useState(true);
@@ -106,7 +106,7 @@ export default function AllTutorialsPage(props) {
   };
 
   const handleCreateButton = () => {
-    history.push("/tutorial/create")
+    navigate("/tutorial/create")
   }
 
   useEffect(() => {

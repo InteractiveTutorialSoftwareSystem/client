@@ -5,9 +5,9 @@ const signupPageStyle = {
     ...container,
     zIndex: "2",
     position: "relative",
-    paddingTop: "20vh",
+    paddingTop: "0",
     color: "#FFFFFF",
-    paddingBottom: "200px",
+    paddingBottom: "0",
   },
   cardHidden: {
     opacity: "0",
@@ -16,12 +16,13 @@ const signupPageStyle = {
   pageHeader: {
     minHeight: "100vh",
     height: "auto",
-    display: "inherit",
+    display: "flex",
     position: "relative",
     margin: "0",
     padding: "0",
     border: "0",
     alignItems: "center",
+    justifyContent: "center",
     "&:before": {
       background: "rgba(0, 0, 0, 0.5)",
     },
@@ -88,6 +89,11 @@ const signupPageStyle = {
   backdrop: {
     zIndex: 1400,
     color: '#fff',
+  },
+  gridContainer: {
+    justifyContent: "center !important",
+    marginLeft: "0 !important",
+    marginRight: "0 !important",
   },
 };
 

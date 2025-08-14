@@ -1,37 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import ReactMarkdown from 'react-markdown'
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import Grid from '@material-ui/core/Grid';
-import Tooltip from '@material-ui/core/Tooltip';
-import Backdrop from '@material-ui/core/Backdrop';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import InputAdornment from "@material-ui/core/InputAdornment";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import InputAdornment from "@mui/material/InputAdornment";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
 // core components
 import Button from "components/CustomButtons/Button.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
 import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 // material ui icon
-import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import StopIcon from '@material-ui/icons/Stop';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import PublishIcon from '@material-ui/icons/Publish';
-import ViewCompactIcon from '@material-ui/icons/ViewCompact';
-import SaveIcon from '@material-ui/icons/Save';
-import SearchIcon from '@material-ui/icons/Search';
-import RefreshIcon from '@material-ui/icons/Refresh';
-import VisibilityIcon from '@material-ui/icons/Visibility';
-import TextRotateUpIcon from '@material-ui/icons/TextRotateUp';
-import ErrorIcon from '@material-ui/icons/Error';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import StopIcon from '@mui/icons-material/Stop';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PublishIcon from '@mui/icons-material/Publish';
+import ViewCompactIcon from '@mui/icons-material/ViewCompact';
+import SaveIcon from '@mui/icons-material/Save';
+import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import TextRotateUpIcon from '@mui/icons-material/TextRotateUp';
+import ErrorIcon from '@mui/icons-material/Error';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 
-import {sampleDescription, sampleInput, samplePythonCode, sampleJavaCode, sampleJavaScriptCode} from './sample.json'
+import sampleData from './sample.json'
+const {sampleDescription, sampleInput, samplePythonCode, sampleJavaCode, sampleJavaScriptCode} = sampleData;
 import '../../../assets/css/codeSection.css';
 import '../../../assets/css/modal.css';
 
@@ -43,10 +44,10 @@ import "../../EditorImport";
 import AudioReactRecorder, { RecordState } from "../../../components/AudioReactRecorder";
 
 // Modal
-import Slide from "@material-ui/core/Slide";
+import Slide from "@mui/material/Slide";
 import Modal from 'react-bootstrap/Modal';
-import IconButton from "@material-ui/core/IconButton";
-import Hidden from '@material-ui/core/Hidden';
+import IconButton from "@mui/material/IconButton";
+import Hidden from '@mui/material/Hidden';
 
 //dock
 import DockLayout from 'rc-dock';
@@ -61,7 +62,7 @@ import styles from "assets/jss/material-kit-react/views/tutorialSectionPageSecti
 
 const useStyles = makeStyles(styles);
 
-const Transition = React.forwardRef(function Transition(props, ref) {
+const Transition = React.forwardRef((props, ref) => {
   return <Slide direction="down" ref={ref} {...props} />;
 });
 
@@ -70,7 +71,7 @@ const Context = React.createContext();
 export default function TutorialPage(props) {
   const { id } = useParams();
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { ...rest } = props;
 
   const [authorLayout, setAuthorLayout] = useState();
@@ -121,15 +122,15 @@ export default function TutorialPage(props) {
   } = useSpeechRecognition()
 
   const tutorTab = () => {
-    var id, title, curInstr, language;
+    let id, title, curInstr, language;
     if (props.languageChosen == "python") {
       id = "python-tutor";
       title = "Python Tutor";
       curInstr = "1";
       language = "3";
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         cached: true,
         closable: true,
         content: (
@@ -153,8 +154,8 @@ export default function TutorialPage(props) {
       curInstr = "0";
       language = "java";
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         cached: true,
         closable: true,
         content: (
@@ -163,7 +164,7 @@ export default function TutorialPage(props) {
               <div className={classes.editorPane}>
                 {value.ide?
                 <a key={value.random} target="_blank"
-                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"}>
+                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"} rel="noreferrer">
                     Link to Java Tutor
                 </a> :
                 <p>No code in Editor panel</p>
@@ -179,8 +180,8 @@ export default function TutorialPage(props) {
       curInstr = "0";
       language = "js";
       return {
-        id: id,
-        title: title,
+        id,
+        title,
         cached: true,
         closable: true,
         content: (
@@ -189,7 +190,7 @@ export default function TutorialPage(props) {
               <div className={classes.editorPane}>
                 {value.ide?
                 <a key={value.random} target="_blank"
-                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"}>
+                  href={"http://pythontutor.com/iframe-embed.html#code=" + encodeURIComponent(value.ide) + "&cumulative=false&curInstr=" + curInstr + "&heapPrimitives=nevernest&origin=opt-frontend.js&py=" + language + "&rawInputLstJSON=%5B%5D&textReferences=false"} rel="noreferrer">
                     Link to JavaScript Tutor
                 </a> :
                 <p>No code in Editor panel</p>
@@ -383,7 +384,7 @@ export default function TutorialPage(props) {
 
   useEffect(() => {
     setIde(props.ide)
-    var editorRefObserver = new MutationObserver(function (mutations, me) {
+    const editorRefObserver = new MutationObserver((mutations, me) => {
       if (editorRef) {
         editorRef.current.editor.setValue(props.ide);
         editorRef.current.editor.clearSelection();
@@ -395,7 +396,7 @@ export default function TutorialPage(props) {
       childList: true,
       subtree: true
     });
-    var inputRefObserver = new MutationObserver(function (mutations, me) {
+    const inputRefObserver = new MutationObserver((mutations, me) => {
       if (inputIdeRef) {
         inputIdeRef.current.editor.setValue(props.input);
         inputIdeRef.current.editor.clearSelection();
@@ -427,7 +428,7 @@ export default function TutorialPage(props) {
   }, [props.tutorialId]);
 
   const saveLayout = () => {
-    var newLayout = props.layoutRef.current.saveLayout();
+    const newLayout = props.layoutRef.current.saveLayout();
     setAuthorLayout(newLayout);
 
     const saveDetails = {
@@ -525,16 +526,16 @@ export default function TutorialPage(props) {
   }
 
   const getMarkdownScroll = () => {
-    var markdownDivElement = document.getElementById('markdownDiv');
+    const markdownDivElement = document.getElementById('markdownDiv');
     if (!markdownDivElement) {return}
-    var scrollPosition = markdownDivElement.scrollTop;
-    var scrollHeight = markdownDivElement.scrollHeight - markdownDivElement.clientHeight;
-    var scrollPercent = scrollPosition/scrollHeight;
+    const scrollPosition = markdownDivElement.scrollTop;
+    const scrollHeight = markdownDivElement.scrollHeight - markdownDivElement.clientHeight;
+    const scrollPercent = scrollPosition/scrollHeight;
     return scrollPercent;
   }
 
   const recordMarkdownSelect = () => {
-    var markdownSelect = getMarkdownSelect();
+    const markdownSelect = getMarkdownSelect();
     const selectEvent = {
       'timestamp': Date.now() - startTime,
       'data': markdownSelect,
@@ -544,8 +545,8 @@ export default function TutorialPage(props) {
 
   const getMarkdownSelect = () => {
     try {
-      let sel = window.getSelection();
-      let range = sel.getRangeAt(0);
+      const sel = window.getSelection();
+      const range = sel.getRangeAt(0);
       let startNode = range.startContainer;
       let endNode = range.endContainer;
 
@@ -566,27 +567,27 @@ export default function TutorialPage(props) {
         var endFlag = endNode;
       }
 
-      let startOffset = range.startOffset; 
-      let endOffset = range.endOffset; 
+      const startOffset = range.startOffset; 
+      const endOffset = range.endOffset; 
 
-      let startTagName = startFlag.nodeName;
-      let startHTML = startFlag.innerHTML;
+      const startTagName = startFlag.nodeName;
+      const startHTML = startFlag.innerHTML;
 
-      let endTagName = endFlag.nodeName;
-      let endHTML = endFlag.innerHTML;
+      const endTagName = endFlag.nodeName;
+      const endHTML = endFlag.innerHTML;
 
-      let rInfo = {
-        startNode: startNode,
-        startOffset: startOffset,
-        startIsText: startIsText,
-        startTagName: startTagName,
-        startHTML: startHTML,
+      const rInfo = {
+        startNode,
+        startOffset,
+        startIsText,
+        startTagName,
+        startHTML,
 
-        endNode: endNode,
-        endOffset: endOffset,
-        endIsText: endIsText,
-        endTagName: endTagName,
-        endHTML: endHTML,
+        endNode,
+        endOffset,
+        endIsText,
+        endTagName,
+        endHTML,
       };
 
       return JSON.stringify(rInfo);
@@ -612,7 +613,7 @@ export default function TutorialPage(props) {
         editor.on("changeSelection", recordInputKeystroke);
         editor.session.on("changeScrollTop", recordInputScroll);
       }
-      var markdownDivElement = document.getElementById('markdownDiv');
+      const markdownDivElement = document.getElementById('markdownDiv');
       if (markdownDivElement) {
         markdownDivElement.onscroll = recordMarkdownScroll;
         markdownDivElement.onmouseup = recordMarkdownSelect;
@@ -776,7 +777,7 @@ export default function TutorialPage(props) {
     if (!consoleIdeRef.current) {
       return
     }
-    var input = "";
+    let input = "";
     if (inputIdeRef.current) {
       input = inputIdeRef.current.editor.getValue();
     }
@@ -785,13 +786,13 @@ export default function TutorialPage(props) {
     setRandom(random + 1)
     const requestOptions = {
       method: 'POST',
-      body: JSON.stringify({ data: ide, input: input, filename: filename })
+      body: JSON.stringify({ data: ide, input, filename })
     };
 
     fetch(process.env.REACT_APP_TUTORIAL_URL + '/run_script/' + props.languageChosen, requestOptions)
       .then(response => response.json())
       .then(data => {
-        var newResult = consoleIdeRef.current.editor.getValue() + "> " + data.output;
+        let newResult = consoleIdeRef.current.editor.getValue() + "> " + data.output;
         if (data.time) {
           newResult += "> Time taken: " + (Math.ceil(data.time * 1000)/1000).toFixed(3) + "s\n";
         }
@@ -804,7 +805,7 @@ export default function TutorialPage(props) {
           const sentenceArray = output.split("\n")
           for (const sentence of sentenceArray) {
             if (sentence.includes("error") || sentence.includes("exception")) {
-              var consoleErrorString = ""
+              let consoleErrorString = ""
               for (const word of sentence.split(" ")) {
                 if (props.languageChosen == "python") {
                   if (!word.includes("'")) {
@@ -830,11 +831,11 @@ export default function TutorialPage(props) {
   const handleSaveRecording = async () => {
     // save recording
     setBackdropOpen(true)
-    var input = "";
+    let input = "";
     if (inputIdeRef.current) {
       input = inputIdeRef.current.editor.getValue();
     }
-    var ide = "";
+    let ide = "";
     if (editorRef.current) {
       ide = editorRef.current.editor.getValue();
     }
@@ -1212,14 +1213,14 @@ export default function TutorialPage(props) {
       <Grid container className={classes.gridItem}>
         <Context.Provider 
           value={{
-            "showCodeRun": showCodeRun,
+            showCodeRun,
             "description": props.description,
-            "ide": ide,
-            "random": random,
-            "editorCursor": editorCursor,
+            ide,
+            random,
+            editorCursor,
             "filename": props.filename,
-            "consoleError": consoleError,
-            "handlePreSearch": handlePreSearch
+            consoleError,
+            handlePreSearch
           }}
         >
           <DockLayout

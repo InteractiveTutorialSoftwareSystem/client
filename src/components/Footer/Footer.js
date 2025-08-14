@@ -5,11 +5,11 @@ import PropTypes from "prop-types";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // material-ui core components
-import { List, ListItem } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { List, ListItem } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
-// @material-ui/icons
-import Favorite from "@material-ui/icons/Favorite";
+// @mui/icons-material
+import Favorite from "@mui/icons-material/Favorite";
 
 import styles from "assets/jss/material-kit-react/components/footerStyle.js";
 

@@ -3,18 +3,18 @@ import { connect } from 'react-redux'
 import { Field, FieldArray, reduxForm, formValueSelector, change as changeFieldValue } from 'redux-form';
 import validate from './validate';
 
-import TextField from '@material-ui/core/TextField'
-import Checkbox from '@material-ui/core/Checkbox'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormControl from '@material-ui/core/FormControl'
-import Select from '@material-ui/core/Select'
-import FormHelperText from '@material-ui/core/FormHelperText'
-import InputLabel from '@material-ui/core/InputLabel'
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@mui/material/TextField'
+import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormControl from '@mui/material/FormControl'
+import Select from '@mui/material/Select'
+import FormHelperText from '@mui/material/FormHelperText'
+import InputLabel from '@mui/material/InputLabel'
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MenuItem from '@mui/material/MenuItem';
 
-import Input from '@material-ui/core/Input';
+import Input from '@mui/material/Input';
 
 import Button from "components/CustomButtons/Button.js";
 
@@ -287,14 +287,14 @@ class QuizForm extends Component {
   }
 }
 
-QuizForm = reduxForm({
+const QuizFormWithReduxForm = reduxForm({
   form: 'quizForm',
   validate
 })(QuizForm);
 
 const selector = formValueSelector('quizForm');
 
-QuizForm = connect(
+const ConnectedQuizForm = connect(
   state => {
     const questions = selector(state, 'questions');
     const questionType = questions && questions.map(question => question.questionType);
@@ -303,6 +303,6 @@ QuizForm = connect(
 
     return { questionType: questionType, answerSelectionType: answerSelectionType, correctAnswer: correctAnswer }
   }
-)(QuizForm)
+)(QuizFormWithReduxForm)
 
-export default QuizForm;
+export default ConnectedQuizForm;

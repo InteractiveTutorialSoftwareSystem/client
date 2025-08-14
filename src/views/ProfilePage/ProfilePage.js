@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 
-// @material-ui/core components
-import { makeStyles } from "@material-ui/core/styles";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-// @material-ui/icons
-import EditIcon from '@material-ui/icons/Edit';
-import CheckIcon from '@material-ui/icons/Check';
+// @mui/material components
+import { makeStyles } from "@mui/styles";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+// @mui/icons-material
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -45,8 +45,14 @@ export default function ProfilePage(props) {
   useEffect(() => {
     fetch(process.env.REACT_APP_AUTH_URL + '/getUserDetails', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({'id': props.userId})
     }).then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       return response.json();
     }).then(response => {
       setLoginType(response.loginType);
@@ -55,6 +61,10 @@ export default function ProfilePage(props) {
       // setRole(response.roles.split(",").length == 2?"both":response.roles);
       setRole(response.roles)
       response.picture?setPicture(response.picture):setPicture("https://ui-avatars.com/api/?name="+response.name[0]);
+    })
+    .catch(error => {
+      console.error('Profile fetch error:', error);
+      // Could add error state here if needed
     });
   }, []);
     

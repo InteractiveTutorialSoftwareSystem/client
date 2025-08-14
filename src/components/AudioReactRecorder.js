@@ -235,12 +235,12 @@ export default class AudioReactRecorder extends React.Component {
 
       self.canvasCtx.beginPath()
 
-      var sliceWidth = (self.WIDTH * 1.0) / bufferLength
-      var x = 0
+      let sliceWidth = (self.WIDTH * 1.0) / bufferLength
+      let x = 0
 
-      for (var i = 0; i < bufferLength; i++) {
-        var v = dataArray[i] / 128.0
-        var y = (v * self.HEIGHT) / 2
+      for (let i = 0; i < bufferLength; i++) {
+        let v = dataArray[i] / 128.0
+        let y = (v * self.HEIGHT) / 2
 
         if (i === 0) {
           self.canvasCtx.moveTo(x, y)

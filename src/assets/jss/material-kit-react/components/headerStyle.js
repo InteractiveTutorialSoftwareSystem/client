@@ -1,6 +1,5 @@
 import {
   containerFluid,
-  defaultFont,
   primaryColor,
   infoColor,
   successColor,
@@ -41,7 +40,7 @@ const headerStyle = {
   },
   container: {
     ...containerFluid,
-    minHeight: "50px",
+    minHeight: "80px",
     flex: "1",
     alignItems: "center",
     justifyContent: "space-between",
@@ -52,14 +51,18 @@ const headerStyle = {
     flex: 1,
   },
   title: {
-    ...defaultFont,
-    lineHeight: "30px",
-    fontSize: "18px",
+    lineHeight: "60px !important",
+    fontSize: "48px !important",
+    fontWeight: "bold !important",
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif !important',
     borderRadius: "3px",
     textTransform: "none",
     color: "inherit",
     padding: "8px 16px",
     letterSpacing: "unset",
+    textAlign: "center !important",
+    flex: 1,
+    display: "block !important",
     "&:hover,&:focus": {
       color: "inherit",
       background: "transparent",
