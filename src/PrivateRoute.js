@@ -42,14 +42,15 @@ function PrivateRoute({ component: Component, roles, ...props }) {
         
         if (isMounted) {
           if (data.role && data.id) {
-            setAuthState({
+            setAuthState(prev => ({
+              ...prev,
               role: data.role,
               serverResponse: true,
               logged: true,
               id: data.id,
               loading: false,
               error: null
-            });
+            }));
           } else {
             // Invalid response, clear token
             localStorage.removeItem('REACT_TOKEN_AUTH_KEY');

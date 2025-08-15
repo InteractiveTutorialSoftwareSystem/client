@@ -533,36 +533,52 @@ export default function CodeSection(props) {
     if (props.playbackIdeRef.current) {
       props.playbackIdeRef.current.editor.clearSelection();
     }
-    for (var i = currentKeystroke; i < props.keystrokes.length; i++) {
-      createIdeEvent(i, currentTime);
+    if (props.keystrokes && props.keystrokes.length) {
+      for (var i = currentKeystroke; i < props.keystrokes.length; i++) {
+        createIdeEvent(i, currentTime);
+      }
     }
-    for (var i = currentConsoleAction; i < props.consoleActions.length; i++) {
-      createConsoleEvent(i, currentTime);
+    if (props.consoleActions && props.consoleActions.length) {
+      for (var i = currentConsoleAction; i < props.consoleActions.length; i++) {
+        createConsoleEvent(i, currentTime);
+      }
     }
-    for (var i = currentConsoleScrollAction; i < props.consoleScrollActions.length; i++){
-      createConsoleScrollEvent(i, currentTime);
+    if (props.consoleScrollActions && props.consoleScrollActions.length) {
+      for (var i = currentConsoleScrollAction; i < props.consoleScrollActions.length; i++){
+        createConsoleScrollEvent(i, currentTime);
+      }
     }
-    if(props.inputKeystrokes !== null && props.inputKeystrokes !== undefined ){
+    if(props.inputKeystrokes && props.inputKeystrokes.length){
       for (var i = currentInputKeystroke; i < props.inputKeystrokes.length; i++){
         createInputEvent(i, currentTime);
       }
     }
-    for (var i = currentInputScrollAction; i < props.inputScrollActions.length; i++){
-      createInputScrollEvent(i, currentTime);
+    if (props.inputScrollActions && props.inputScrollActions.length) {
+      for (var i = currentInputScrollAction; i < props.inputScrollActions.length; i++){
+        createInputScrollEvent(i, currentTime);
+      }
     }
-    for (var i = currentLayoutAction; i < props.layoutActions.length; i++) {
-      createLayoutEvent(i, currentTime);
+    if (props.layoutActions && props.layoutActions.length) {
+      for (var i = currentLayoutAction; i < props.layoutActions.length; i++) {
+        createLayoutEvent(i, currentTime);
+      }
     }
-    for (var i = currentSelectAction; i < props.selectActions.length; i++) {
-      createMarkdownSelectEvent(i, currentTime);
+    if (props.selectActions && props.selectActions.length) {
+      for (var i = currentSelectAction; i < props.selectActions.length; i++) {
+        createMarkdownSelectEvent(i, currentTime);
+      }
     }
-    for (var i = currentScrollAction; i < props.scrollActions.length; i++) {
-      createMarkdownScrollEvent(i, currentTime);
+    if (props.scrollActions && props.scrollActions.length) {
+      for (var i = currentScrollAction; i < props.scrollActions.length; i++) {
+        createMarkdownScrollEvent(i, currentTime);
+      }
     }
-    for (var i = currentEditorScrollAction; i < props.editorScrollActions.length; i++){
-      createEditorScrollEvent(i, currentTime);
+    if (props.editorScrollActions && props.editorScrollActions.length) {
+      for (var i = currentEditorScrollAction; i < props.editorScrollActions.length; i++){
+        createEditorScrollEvent(i, currentTime);
+      }
     }
-    if (props.transcript) {
+    if (props.transcript && props.transcript.length) {
       for (var i = currentTranscript; i < props.transcript.length; i++) {
         createTranscriptEvent(i, currentTime);
       }
