@@ -169,8 +169,8 @@ export default function LoginPage(props) {
             );
           }
         })
-        .catch(error => {
-          console.error('Registration error:', error);
+        .catch(() => {
+          // Handle registration error silently
           setErrorMsg("Network error. Please check your connection and try again.");
           setErrorOpen(true);
         });
@@ -224,14 +224,7 @@ export default function LoginPage(props) {
     })
   };
 
-  const onFailure = (error) => {
-    // Handles Google setup fail
-    if (error.details) {
-      document.getElementById('googleButton').style.display = "none";
-      setErrorMsg(error.details);
-      setErrorOpen(true);
-    }
-  }
+  // Note: onFailure function removed as it's not used with the current Google Login setup
 
   return (
     logged?<Navigate to='/tutorial' />:
@@ -404,7 +397,7 @@ export default function LoginPage(props) {
                   <CardFooter className={classes.cardFooter}>
                     <GoogleLogin
                       onSuccess={googleRegister}
-                      onError={(error) => {
+                      onError={() => {
                         setErrorMsg("Google Registration failed");
                         setErrorOpen(true);
                       }}

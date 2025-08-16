@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 // @mui/material components
 import { makeStyles } from "@mui/styles";
 import Grid from '@mui/material/Grid';
@@ -413,3 +414,8 @@ export default function TutorialPage(props) {
     </div>
   );
 }
+
+TutorialPage.propTypes = {
+  userId: PropTypes.string,
+  role: PropTypes.string,
+};

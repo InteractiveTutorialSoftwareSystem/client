@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 // @mui/material components
 import { makeStyles } from "@mui/styles";
 
@@ -18,3 +19,7 @@ export default function QuestionSection(props) {
     </div>
   );
 }
+
+QuestionSection.propTypes = {
+  question: PropTypes.object.isRequired,
+};

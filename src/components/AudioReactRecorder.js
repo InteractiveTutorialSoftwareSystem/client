@@ -154,7 +154,7 @@ export default class AudioReactRecorder extends React.Component {
         self.tested = true
         // if this reduces to 0 we are not getting any sound
         // if (!left.reduce((a, b) => a + b)) {
-        //   console.log('Error: There seems to be an issue with your Mic')
+        //   // console.log('Error: There seems to be an issue with your Mic')
         //   // clean up;
         //   self.stop()
         //   self.stream.getTracks().forEach(function (track) {
@@ -265,7 +265,7 @@ export default class AudioReactRecorder extends React.Component {
       //TODO: on got stream
     } catch (err) {
       //TODO: error getting stream
-      console.log('Error: Issue getting mic', err)
+      // console.log('Error: Issue getting mic', err)
     }
 
     this.setUpRecording()

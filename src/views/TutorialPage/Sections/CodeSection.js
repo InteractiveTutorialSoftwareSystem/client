@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+// useParams import removed as it's not used
 import PropTypes from 'prop-types';
 // @mui/material components
 import { makeStyles } from "@mui/styles";
@@ -45,11 +45,9 @@ import ErrorIcon from '@mui/icons-material/Error';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 // Modal
-import Slide from "@mui/material/Slide";
+// Slide import removed as it's not used
 import Modal from 'react-bootstrap/Modal';
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
+// Dialog, DialogTitle, and DialogContent imports removed as they're not used
 import IconButton from "@mui/material/IconButton";
 import '../../../assets/css/modal.css';
 
@@ -88,13 +86,15 @@ TabPanel.propTypes = {
 const useStyles = makeStyles(styles);
 const Context = React.createContext();
 
-const Transition = React.forwardRef((props, ref) => {
-  return <Slide direction="down" ref={ref} {...props} />;
-});
+// Transition component removed as it's not used
+// const Transition = React.forwardRef((props, ref) => {
+//   return <Slide direction="down" ref={ref} {...props} />;
+// });
+// Transition.displayName = 'Transition';
 
 export default function CodeSection(props) {
-  const { id } = useParams();
   const classes = useStyles();
+  // id removed as it's not used
   
   const practiceIdeRef = useRef(null);
 
@@ -534,52 +534,52 @@ export default function CodeSection(props) {
       props.playbackIdeRef.current.editor.clearSelection();
     }
     if (props.keystrokes && props.keystrokes.length) {
-      for (var i = currentKeystroke; i < props.keystrokes.length; i++) {
+      for (let i = currentKeystroke; i < props.keystrokes.length; i++) {
         createIdeEvent(i, currentTime);
       }
     }
     if (props.consoleActions && props.consoleActions.length) {
-      for (var i = currentConsoleAction; i < props.consoleActions.length; i++) {
+      for (let i = currentConsoleAction; i < props.consoleActions.length; i++) {
         createConsoleEvent(i, currentTime);
       }
     }
     if (props.consoleScrollActions && props.consoleScrollActions.length) {
-      for (var i = currentConsoleScrollAction; i < props.consoleScrollActions.length; i++){
+      for (let i = currentConsoleScrollAction; i < props.consoleScrollActions.length; i++){
         createConsoleScrollEvent(i, currentTime);
       }
     }
     if(props.inputKeystrokes && props.inputKeystrokes.length){
-      for (var i = currentInputKeystroke; i < props.inputKeystrokes.length; i++){
+      for (let i = currentInputKeystroke; i < props.inputKeystrokes.length; i++){
         createInputEvent(i, currentTime);
       }
     }
     if (props.inputScrollActions && props.inputScrollActions.length) {
-      for (var i = currentInputScrollAction; i < props.inputScrollActions.length; i++){
+      for (let i = currentInputScrollAction; i < props.inputScrollActions.length; i++){
         createInputScrollEvent(i, currentTime);
       }
     }
     if (props.layoutActions && props.layoutActions.length) {
-      for (var i = currentLayoutAction; i < props.layoutActions.length; i++) {
+      for (let i = currentLayoutAction; i < props.layoutActions.length; i++) {
         createLayoutEvent(i, currentTime);
       }
     }
     if (props.selectActions && props.selectActions.length) {
-      for (var i = currentSelectAction; i < props.selectActions.length; i++) {
+      for (let i = currentSelectAction; i < props.selectActions.length; i++) {
         createMarkdownSelectEvent(i, currentTime);
       }
     }
     if (props.scrollActions && props.scrollActions.length) {
-      for (var i = currentScrollAction; i < props.scrollActions.length; i++) {
+      for (let i = currentScrollAction; i < props.scrollActions.length; i++) {
         createMarkdownScrollEvent(i, currentTime);
       }
     }
     if (props.editorScrollActions && props.editorScrollActions.length) {
-      for (var i = currentEditorScrollAction; i < props.editorScrollActions.length; i++){
+      for (let i = currentEditorScrollAction; i < props.editorScrollActions.length; i++){
         createEditorScrollEvent(i, currentTime);
       }
     }
     if (props.transcript && props.transcript.length) {
-      for (var i = currentTranscript; i < props.transcript.length; i++) {
+      for (let i = currentTranscript; i < props.transcript.length; i++) {
         createTranscriptEvent(i, currentTime);
       }
     }
@@ -867,12 +867,13 @@ export default function CodeSection(props) {
       setCurrentConsoleScrollAction(consoleScrollAction);
       createConsoleScrollEvent(consoleScrollAction, time);
 
+      let inputKeystroke;
       if(props.inputKeystrokes !== null && props.inputKeystrokes !== undefined){
-        var inputKeystroke = getCurrentElement(props.inputKeystrokes, time);
+        inputKeystroke = getCurrentElement(props.inputKeystrokes, time);
         setCurrentInputKeystroke(inputKeystroke);
         createInputEvent(inputKeystroke, time);
       } else{
-        var inputKeystroke = ""
+        inputKeystroke = ""
       }
       const inputScrollAction = getCurrentElement(props.inputScrollActions, time);
       setCurrentInputScrollAction(inputScrollAction);
@@ -890,12 +891,13 @@ export default function CodeSection(props) {
       setCurrentEditorScrollAction(editorScrollAction);
       createEditorScrollEvent(editorScrollAction, time);
 
+      let transcript;
       if (props.transcript) {
-        var transcript = getCurrentElement(props.transcript, time);
+        transcript = getCurrentElement(props.transcript, time);
         setCurrentTranscript(transcript);
         createTranscriptEvent(transcript, time);
       } else {
-        var transcript = "";
+        transcript = "";
       }
       return Promise.resolve([keystroke, consoleAction, consoleScrollAction, inputKeystroke, inputScrollAction, layoutAction, selectAction, scrollAction, editorScrollAction, transcript, time]);
     })
@@ -1055,7 +1057,7 @@ export default function CodeSection(props) {
             onSeek={()=>pause()}
             onSeeked={()=>seeked()}
             customAdditionalControls={[
-              <div>
+              <div key="playback-settings">
                 <IconButton
                   onClick={(e)=>setPlaybackSettingsAnchor(e.currentTarget)}
                  ><SettingsIcon/>
@@ -1305,3 +1307,35 @@ export default function CodeSection(props) {
     </div>
   );
 }
+
+// Add PropTypes for CodeSection
+CodeSection.propTypes = {
+  description: PropTypes.string,
+  transcript: PropTypes.array,
+  layoutRef: PropTypes.object,
+  inputIdeRef: PropTypes.object,
+  playbackIdeRef: PropTypes.object,
+  consoleIdeRef: PropTypes.object,
+  player: PropTypes.object,
+  filename: PropTypes.string,
+  languageChosen: PropTypes.string,
+  themeChosen: PropTypes.string,
+  keystrokes: PropTypes.array,
+  consoleActions: PropTypes.array,
+  consoleScrollActions: PropTypes.array,
+  inputKeystrokes: PropTypes.array,
+  inputScrollActions: PropTypes.array,
+  layoutActions: PropTypes.array,
+  selectActions: PropTypes.array,
+  scrollActions: PropTypes.array,
+  editorScrollActions: PropTypes.array,
+  recordingSrc: PropTypes.string,
+  showSearchModal: PropTypes.bool,
+  setShowSearchModal: PropTypes.func,
+  frequentWord: PropTypes.array,
+  tabValue: PropTypes.number,
+  setTabValue: PropTypes.func,
+  version: PropTypes.string,
+  input: PropTypes.string,
+  tutorialSectionId: PropTypes.string
+};

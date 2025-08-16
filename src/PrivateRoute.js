@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import PropTypes from 'prop-types';
 import { authFetch } from "./auth";
 
 function PrivateRoute({ component: Component, roles, ...props }) {
@@ -123,5 +124,10 @@ function PrivateRoute({ component: Component, roles, ...props }) {
   // Render the protected component
   return <Component userId={authState.id} role={authState.role} {...props} />
 }
+
+PrivateRoute.propTypes = {
+  component: PropTypes.elementType.isRequired,
+  roles: PropTypes.array
+};
 
 export default PrivateRoute;

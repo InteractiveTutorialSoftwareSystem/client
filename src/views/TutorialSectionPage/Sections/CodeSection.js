@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import ReactMarkdown from 'react-markdown'
 // @mui/material components
 import { makeStyles } from "@mui/styles";
@@ -550,21 +551,23 @@ export default function TutorialPage(props) {
       let startNode = range.startContainer;
       let endNode = range.endContainer;
 
+      let startIsText, startFlag;
       if (startNode.nodeType == 3) {
-        var startIsText = true;
-        var startFlag = startNode.parentNode;
+        startIsText = true;
+        startFlag = startNode.parentNode;
         startNode = startNode.nodeValue;
       } else {
-        var startIsText = false;
-        var startFlag = startNode;
+        startIsText = false;
+        startFlag = startNode;
       }
+      let endIsText, endFlag;
       if (endNode.nodeType == 3) {
-        var endIsText = true;
-        var endFlag = endNode.parentNode;
+        endIsText = true;
+        endFlag = endNode.parentNode;
         endNode = endNode.nodeValue;
       } else {
-        var endIsText = false;
-        var endFlag = endNode;
+        endIsText = false;
+        endFlag = endNode;
       }
 
       const startOffset = range.startOffset; 
@@ -1147,19 +1150,19 @@ export default function TutorialPage(props) {
               <CustomDropdown
                 buttonText={"Layout"}
                 dropdownList={[
-                  <span className={classes.dropdownDetail}>
+                  <span key="save-layout-author" className={classes.dropdownDetail}>
                     <SaveIcon className={classes.dropdownIcon}/>
                     Save Layout
                   </span>,
                   [
-                    <span className={classes.dropdownDetail}>
+                    <span key="load-layout-author" className={classes.dropdownDetail}>
                       <ViewCompactIcon className={classes.dropdownIcon}/>
                       Load Saved Layout
                     </span>,
                     authorLayout == null || props.recordStartState
                   ],
                   [
-                    <span className={classes.dropdownDetail}>
+                    <span key="restore-layout-author" className={classes.dropdownDetail}>
                       <RefreshIcon className={classes.dropdownIcon}/>
                       Restore Layout
                     </span>,
@@ -1183,19 +1186,19 @@ export default function TutorialPage(props) {
                 buttonText={<MoreHorizIcon />}
                 caret={false}
                 dropdownList={[
-                  <span className={classes.dropdownDetail}>
+                  <span key="save-layout-author-mobile" className={classes.dropdownDetail}>
                     <SaveIcon className={classes.dropdownIcon}/>
                     Save Layout
                   </span>,
                   [
-                    <span className={classes.dropdownDetail}>
+                    <span key="load-layout-author-mobile" className={classes.dropdownDetail}>
                       <ViewCompactIcon className={classes.dropdownIcon}/>
                       Load Saved Layout
                     </span>,
                     authorLayout == null || props.recordStartState
                   ],
                   [
-                    <span className={classes.dropdownDetail}>
+                    <span key="restore-layout-author-mobile" className={classes.dropdownDetail}>
                       <RefreshIcon className={classes.dropdownIcon}/>
                       Restore Layout
                     </span>,
@@ -1335,3 +1338,24 @@ export default function TutorialPage(props) {
     </div>
   );
 }
+
+TutorialPage.propTypes = {
+  languageChosen: PropTypes.string,
+  handleDescriptionChange: PropTypes.func,
+  handleIdeChange: PropTypes.func,
+  handleInputIdeChange: PropTypes.func,
+  version: PropTypes.string,
+  recordingFound: PropTypes.bool,
+  ide: PropTypes.string,
+  input: PropTypes.string,
+  tutorialId: PropTypes.string,
+  userId: PropTypes.string,
+  role: PropTypes.string,
+  layoutRef: PropTypes.object,
+  recordStartState: PropTypes.bool,
+  handleRecordStartStateChange: PropTypes.func,
+  tutorialSectionTitle: PropTypes.string,
+  description: PropTypes.string,
+  sectionSequence: PropTypes.number,
+  filename: PropTypes.string,
+};

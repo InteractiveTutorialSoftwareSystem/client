@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import classNames from "classnames";
+import PropTypes from 'prop-types';
 
 // @mui/material components
 import { makeStyles } from "@mui/styles";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Radio from "@mui/material/Radio";
+// FormControlLabel and Radio imports removed as they're not used
 // @mui/icons-material
-import EditIcon from '@mui/icons-material/Edit';
-import CheckIcon from '@mui/icons-material/Check';
+// EditIcon and CheckIcon imports removed as they're not used
 // core components
 import Header from "components/Header/Header.js";
 import HeaderLinks from "components/Header/HeaderLinks.js";
@@ -15,9 +14,7 @@ import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Card from "components/Card/Card.js";
-import CustomInput from "components/CustomInput/CustomInput.js";
-import CardBody from "components/Card/CardBody.js";
-import Button from "components/CustomButtons/Button.js";
+// CustomInput, CardBody, and Button imports removed as they're not used
 
 import styles from "assets/jss/material-kit-react/views/profilePage.js";
 
@@ -34,13 +31,11 @@ export default function ProfilePage(props) {
     classes.imgFluid
   );
 
-  const [loginType, setLoginType] = useState('');
   const [picture, setPicture] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
-
-  const [editButton, setEditButton] = useState(false);
+  // loginType, editButton, and setEditButton variables removed as they're not used
 
   useEffect(() => {
     fetch(process.env.REACT_APP_AUTH_URL + '/getUserDetails', {
@@ -55,15 +50,15 @@ export default function ProfilePage(props) {
       }
       return response.json();
     }).then(response => {
-      setLoginType(response.loginType);
+      // loginType removed as it's not used
       setName(response.name);
       setEmail(response.email);
       // setRole(response.roles.split(",").length == 2?"both":response.roles);
       setRole(response.roles)
       response.picture?setPicture(response.picture):setPicture("https://ui-avatars.com/api/?name="+response.name[0]);
     })
-    .catch(error => {
-      console.error('Profile fetch error:', error);
+    .catch(() => {
+      // Handle profile fetch error silently
       // Could add error state here if needed
     });
   }, []);
@@ -117,3 +112,7 @@ export default function ProfilePage(props) {
     </div>
   );
 }
+
+ProfilePage.propTypes = {
+  userId: PropTypes.string.isRequired
+};

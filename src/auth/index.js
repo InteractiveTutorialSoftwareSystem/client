@@ -11,7 +11,7 @@ export const [useAuth, authFetch, login, logout] =
             body: token.access_token
         })
         .then(r => r.json())
-        .catch((error)=>{
+        .catch(()=>{
             window.localStorage.removeItem('REACT_TOKEN_AUTH_KEY');
         })
     });

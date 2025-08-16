@@ -1,5 +1,4 @@
 /*eslint-disable*/
-import React from "react";
 // @mui/material components
 import { makeStyles } from "@mui/styles";
 // @mui/icons-material

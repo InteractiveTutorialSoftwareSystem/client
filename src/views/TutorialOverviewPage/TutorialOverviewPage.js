@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { format, isAfter, parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -26,7 +26,7 @@ import styled from "styled-components";
 import styles from "assets/jss/material-kit-react/views/tutorialOverviewPage.js";
 
 // Modal
-import Slide from "@mui/material/Slide";
+// Slide import removed as it's not used
 import Modal from 'react-bootstrap/Modal';
 import IconButton from "@mui/material/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -54,9 +54,11 @@ const Item = styled.div`
   margin-bottom: 8px;
 `;
 
-const Transition = React.forwardRef((props, ref) => {
-  return <Slide direction="down" ref={ref} {...props} />;
-});
+// Transition component removed as it's not used
+// const Transition = React.forwardRef((props, ref) => {
+//   return <Slide direction="down" ref={ref} {...props} />;
+// });
+// Transition.displayName = 'Transition';
 
 export default function TutorialOverviewPage(props) {
   const [unorderedSequence, setUnorderedSequence] = useState(null);
@@ -193,7 +195,7 @@ export default function TutorialOverviewPage(props) {
   
       fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial/update/' + id, requestOptions)
         .then(response => response.json())
-        .then(data => {
+        .then(() => {
           setSuccessMsg("Tutorial sequence has been saved")
           setSnackbarOpen(true)
           setSuccessMsg("")
@@ -269,7 +271,7 @@ export default function TutorialOverviewPage(props) {
     
         fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial/update/' + id, requestOptions)
           .then(response => response.json())
-          .then((data) => {
+          .then(() => {
             setIsHidden(false);
             setShowTutorialModal(false);
           });
@@ -288,7 +290,7 @@ export default function TutorialOverviewPage(props) {
   
       fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial/update/' + id, requestOptions)
         .then(response => response.json())
-        .then((data) => {
+        .then(() => {
           setIsHidden(false);
           setShowTutorialModal(false);
         });
@@ -306,7 +308,7 @@ export default function TutorialOverviewPage(props) {
 
     fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorial/update/' + id, requestOptions)
       .then(response => response.json())
-      .then((data) => {
+      .then(() => {
         setIsHidden(true);
       });
   }

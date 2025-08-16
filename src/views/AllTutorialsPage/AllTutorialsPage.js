@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from 'prop-types';
 // @mui/material components
 import { makeStyles, withStyles } from "@mui/styles";
 import List from '@mui/material/List';
@@ -46,9 +47,8 @@ export default function AllTutorialsPage(props) {
     if (sequence === 1) {
       lessonNoun = "lesson";
     }
-    let page;
     const normalizedLastPage = last_page > sequence ? sequence : last_page;
-    page = normalizedLastPage === 0 ? 1 : normalizedLastPage;
+    const page = normalizedLastPage === 0 ? 1 : normalizedLastPage;
     let redirectUrl = "/tutorial/" + id + "/" + page
     if (props.role == "author") {
       redirectUrl = "/tutorial/overview/" + id
@@ -70,6 +70,17 @@ export default function AllTutorialsPage(props) {
         </a>
       </GridItem>
     );
+  };
+  
+  // Add PropTypes for TutorialCard component
+  TutorialCard.propTypes = {
+    id: PropTypes.string.isRequired,
+    language: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    sequence: PropTypes.number.isRequired,
+    user_name: PropTypes.string.isRequired,
+    user_picture: PropTypes.string.isRequired,
+    last_page: PropTypes.number.isRequired
   };
   
   const { ...rest } = props;
@@ -235,3 +246,8 @@ export default function AllTutorialsPage(props) {
     </div>
   );
 }
+
+AllTutorialsPage.propTypes = {
+  role: PropTypes.string.isRequired,
+  userId: PropTypes.string.isRequired
+};

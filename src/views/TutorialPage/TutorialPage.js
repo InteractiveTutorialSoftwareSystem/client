@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import PropTypes from 'prop-types';
 import { useParams, useNavigate } from "react-router-dom";
 // @mui/material components
 import { makeStyles } from "@mui/styles";
@@ -316,7 +317,7 @@ export default function TutorialPage(props) {
                 }))
                 setFrequentWord(frequentWordData);
               } catch (error) {
-                console.error('Error parsing frequent_word data:', error);
+                // Handle JSON parsing error silently
                 setFrequentWord([]);
               }
             }
@@ -494,18 +495,18 @@ export default function TutorialPage(props) {
                     <CustomDropdown
                       buttonText={"Layout"}
                       dropdownList={[
-                        <span className={classes.dropdownDetail}>
+                        <span key="save-layout" className={classes.dropdownDetail}>
                           <SaveIcon className={classes.dropdownIcon}/>
                           Save Layout
                         </span>,
                         [
-                          <span className={classes.dropdownDetail}>
+                          <span key="load-layout" className={classes.dropdownDetail}>
                             <ViewCompactIcon className={classes.dropdownIcon}/>
                             Load Saved Layout
                           </span>,
                           learnerLayout == null
                         ],
-                        <span className={classes.dropdownDetail}>
+                        <span key="restore-layout" className={classes.dropdownDetail}>
                           <RefreshIcon className={classes.dropdownIcon}/>
                           Restore Layout
                         </span>,
@@ -528,18 +529,18 @@ export default function TutorialPage(props) {
                       buttonText={<MoreHorizIcon />}
                       caret={false}
                       dropdownList={[
-                        <span className={classes.dropdownDetail}>
+                        <span key="save-layout-mobile" className={classes.dropdownDetail}>
                           <SaveIcon className={classes.dropdownIcon}/>
                           Save Layout
                         </span>,
                         [
-                          <span className={classes.dropdownDetail}>
+                          <span key="load-layout-mobile" className={classes.dropdownDetail}>
                             <ViewCompactIcon className={classes.dropdownIcon}/>
                             Load Saved Layout
                           </span>,
                           learnerLayout == null
                         ],
-                        <span className={classes.dropdownDetail}>
+                        <span key="restore-layout-mobile" className={classes.dropdownDetail}>
                           <RefreshIcon className={classes.dropdownIcon}/>
                           Restore Layout
                         </span>,
@@ -602,3 +603,9 @@ export default function TutorialPage(props) {
     </div>
   );
 }
+
+// Add PropTypes for TutorialPage
+TutorialPage.propTypes = {
+  userId: PropTypes.string.isRequired,
+  role: PropTypes.string.isRequired
+};

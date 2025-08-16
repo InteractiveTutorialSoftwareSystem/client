@@ -1,0 +1,4 @@
+node_modules/
+build/
+src/components/AudioReactRecorder.js
+src/components/QuestionForm/QuizForm.js

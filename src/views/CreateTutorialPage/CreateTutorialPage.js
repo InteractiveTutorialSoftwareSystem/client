@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from 'prop-types';
 // @mui/material components
 import { makeStyles } from "@mui/styles";
 // core components
@@ -153,3 +154,7 @@ export default function CreateTutorialPage(props) {
     </div>
   );
 }
+
+CreateTutorialPage.propTypes = {
+  userId: PropTypes.string.isRequired
+};

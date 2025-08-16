@@ -1,4 +1,3 @@
-import React from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // react components for routing our app without refresh

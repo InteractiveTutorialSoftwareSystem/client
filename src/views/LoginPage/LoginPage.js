@@ -102,9 +102,9 @@ export default function LoginPage(props) {
             setOpen(true);
           }
       })
-      .catch(error => {
+      .catch(() => {
         setLoading(false);
-        console.error('Login error:', error);
+        // Handle login error silently
         setErrorMsg("Network error. Please check your connection and try again.");
         setOpen(true);
       });
@@ -145,21 +145,14 @@ export default function LoginPage(props) {
           setOpen(true);
         }
     })
-    .catch(error => {
-      console.error('Google login error:', error);
+    .catch(() => {
+      // Handle Google login error silently
       setErrorMsg("Google login failed. Please try again.");
       setOpen(true);
     })
   };
 
-  const onFailure = (error) => {
-    // Handles Google setup fail
-    if (error.details) {
-      document.getElementById('googleButton').style.display = "none";
-      setErrorMsg(error.details);
-      setOpen(true);
-    }
-  }
+  // Note: onFailure function removed as it's not used with the current Google Login setup
 
   const onGuestClick = (e) => {
     // Handles guest login
@@ -190,8 +183,8 @@ export default function LoginPage(props) {
           setOpen(true);
         }
     })
-    .catch(error => {
-      console.error('Guest login error:', error);
+    .catch(() => {
+      // Handle guest login error silently
       setErrorMsg("Guest login failed. Please try again.");
       setOpen(true);
     });
@@ -305,7 +298,7 @@ export default function LoginPage(props) {
                   <CardFooter className={classes.cardFooter}>
                     <GoogleLogin
                       onSuccess={googleLogin}
-                      onError={(error) => {
+                      onError={() => {
                         setErrorMsg("Google Login failed");
                         setOpen(true);
                       }}

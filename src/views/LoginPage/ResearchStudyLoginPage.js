@@ -9,7 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 // core components
 import Header from "components/Header/Header.js";
-import HeaderLinks from "components/Header/HeaderLinks.js";
+// HeaderLinks import removed as it's not used
 import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
