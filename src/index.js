@@ -35,7 +35,7 @@ root.render(
     <Helmet>
       <script src="//cdn.loop11.com/embed.js" type="text/javascript" async="async" />
     </Helmet>
-    <Router>
+    <Router basename={process.env.PUBLIC_URL || ""}>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/register" element={<RegisterPage />} />
