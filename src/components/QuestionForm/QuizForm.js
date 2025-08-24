@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Field, FieldArray, reduxForm, formValueSelector, change as changeFieldValue } from 'redux-form';
 import validate from './validate';
 
-import TextField from '@mui/material/TextField'
 import Checkbox from '@mui/material/Checkbox'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormControl from '@mui/material/FormControl'
@@ -17,6 +16,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Input from '@mui/material/Input';
 
 import Button from "components/CustomButtons/Button.js";
+import CustomInput from "components/CustomInput/CustomInput.js";
+import { successColor, grayColor, dangerColor } from "assets/jss/material-kit-react.js";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -32,27 +33,36 @@ const MenuProps = {
 class QuizForm extends Component {
 
   renderInputField = ({ input, label, type, meta: { touched, error } }) => (
-    <TextField
-      {...input}
-      type={type}
-      placeholder={label}
-      label={label}
-      error={touched && error != null}
+    <CustomInput
+      labelText={label}
+      formControlProps={{
+        fullWidth: true,
+        error: touched && error != null
+      }}
+      inputProps={{
+        ...input,
+        type: type,
+        placeholder: label
+      }}
       helperText={touched && error}
-      style={{ width: "100%" }}
     />
   );
 
   renderTextareaField = ({ input, label, type, meta: { touched, error } }) => (
-    <TextField
-      {...input}
-      type={type}
-      multiline
-      placeholder={label}
-      label={label}
-      error={touched && error != null}
+    <CustomInput
+      labelText={label}
+      formControlProps={{
+        fullWidth: true,
+        error: touched && error != null
+      }}
+      inputProps={{
+        ...input,
+        type: type,
+        multiline: true,
+        rows: 3,
+        placeholder: label
+      }}
       helperText={touched && error}
-      style={{ width: "100%" }}
     />
   );
 
@@ -133,20 +143,20 @@ class QuizForm extends Component {
         <Button onClick={() => fields.push()}>Add Answer</Button>
       </div>
       {fields.map((answer, index) => (
-        <div key={index} style={{display: "flex", padding: "10px", alignItems: "center", backgroundColor: "#CCEECC"}}>
+        <div key={index} style={{display: "flex", padding: "10px", alignItems: "center", backgroundColor: successColor + "20"}}>
           <Field
             name={answer}
             type="text"
             component={this.renderTextareaField}
             label={`Answer #${index + 1}`}
           />
-          <IconButton aria-label="Delete Answer" onClick={() => fields.remove(index)} style={{color: "red", height: "fit-content", marginLeft: "auto"}}>
+          <IconButton aria-label="Delete Answer" onClick={() => fields.remove(index)} style={{color: dangerColor, height: "fit-content", marginLeft: "auto"}}>
             <DeleteIcon />
           </IconButton>
         </div>
       ))}
 
-        <div style={{backgroundColor: "#CCDECC", padding: "10px"}}>
+        <div style={{backgroundColor: successColor + "15", padding: "10px"}}>
           {!answerSelectionType && (
             <h5>Please choose the answer type</h5>
           )}
@@ -155,7 +165,7 @@ class QuizForm extends Component {
               name={`${question}.correctAnswer`}
               component={this.renderSelectField}
               label="Correct Answer"
-              style={{backgroundColor: "#EEEEEE"}}
+              style={{backgroundColor: grayColor + "20"}}
             >
               <option value="" disabled>Please select correct answer</option>
               {fields.map((answer, index) => (
@@ -168,7 +178,7 @@ class QuizForm extends Component {
               name={`${question}.correctAnswer`}
               component={this.renderMultiSelectField}
               label="Correct Answer"
-              style={{backgroundColor: "#EEEEEE"}}
+              style={{backgroundColor: grayColor + "20"}}
             >
               <option value={[]} disabled>Please select correct answer</option>
               {fields.map((answer, index) => (
@@ -185,10 +195,10 @@ class QuizForm extends Component {
   renderQuestions = ({ fields, meta: { touched, error, submitFailed } }) => (
     <div style={{display: "flex", flexDirection: "column"}}>
       {fields.map((question, index) => (
-        <div key={index} style={{display: "flex", flexDirection: "column", padding: "10px", backgroundColor: "#EFEFEF", margin: "5px 0px"}}>
+        <div key={index} style={{display: "flex", flexDirection: "column", padding: "10px", backgroundColor: grayColor + "15", margin: "5px 0px"}}>
           <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
             <h4>Question #{index + 1}</h4>
-            <IconButton aria-label="Delete Question" onClick={() => fields.remove(index)} style={{color: "red", height: "fit-content"}}>
+            <IconButton aria-label="Delete Question" onClick={() => fields.remove(index)} style={{color: dangerColor, height: "fit-content"}}>
               <DeleteIcon />
             </IconButton>
           </div>

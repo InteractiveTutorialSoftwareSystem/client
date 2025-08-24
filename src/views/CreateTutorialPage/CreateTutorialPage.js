@@ -13,10 +13,11 @@ import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
-import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 
 import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from "components/Snackbar/SnackbarContent.js";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import styles from "assets/jss/material-kit-react/views/createTutorialPage.js";
 import image from "assets/img/bg7.jpg";
@@ -35,6 +36,7 @@ export default function CreateTutorialPage(props) {
   
   const [tutorialTitle, setTutorialTitle] = useState("")
   const [languageChosen, setLanguageChosen] = useState(null)
+  const [languageMenuAnchor, setLanguageMenuAnchor] = useState(null);
 
   const [open, setOpen] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState('Please try again');
@@ -81,7 +83,7 @@ export default function CreateTutorialPage(props) {
         absolute
         color="transparent"
         brand="Interactive Tutorial System"
-        rightLinks={<HeaderLinks />}
+        leftLinks={<HeaderLinks />}
         {...rest}
       />
       <div
@@ -112,14 +114,31 @@ export default function CreateTutorialPage(props) {
                         }
                       }}
                     />
-                    <CustomDropdown
-                      buttonText={languageChosen ? languageChosen : "Choose Language"}
-                      buttonProps={{
-                        fullWidth: true
-                      }}
-                      dropdownList={languageList}
-                      onClick={(e) => {handleLanguageChange(e)}}
-                    />
+                    <Button 
+                      fullWidth
+                      onClick={(e) => setLanguageMenuAnchor(e.currentTarget)}
+                      style={{textTransform: 'none', justifyContent: 'flex-start'}}
+                    >
+                      {languageChosen ? languageChosen : "Choose Language"}
+                    </Button>
+                    <Menu
+                      anchorEl={languageMenuAnchor}
+                      open={Boolean(languageMenuAnchor)}
+                      onClose={() => setLanguageMenuAnchor(null)}
+                      keepMounted
+                    >
+                      {languageList.map((language) => (
+                        <MenuItem 
+                          key={language}
+                          onClick={() => {
+                            handleLanguageChange(language); 
+                            setLanguageMenuAnchor(null);
+                          }}
+                        >
+                          {language}
+                        </MenuItem>
+                      ))}
+                    </Menu>
                   </CardBody>
                   <CardFooter className={classes.cardFooter}>
                     <Button color="primary" onClick={handleCreateButton}>

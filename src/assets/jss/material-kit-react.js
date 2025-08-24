@@ -63,73 +63,97 @@ const card = {
   background: "#fff",
 };
 
+// Professional Typography System
 const defaultFont = {
-  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-  fontWeight: "300",
-  lineHeight: "1.5em",
+  fontFamily: '"Inter", "SF Pro Display", "Segoe UI", "Roboto", "Helvetica Neue", sans-serif',
+  fontWeight: "400",
+  lineHeight: "1.6",
+  letterSpacing: "-0.01em",
 };
 
-const primaryColor = "#9c27b0";
-const warningColor = "#ff9800";
-const dangerColor = "#f44336";
-const successColor = "#4caf50";
-const infoColor = "#00acc1";
-const roseColor = "#e91e63";
-const grayColor = "#999999";
+const headingFont = {
+  fontFamily: '"Inter", "SF Pro Display", "Segoe UI", "Roboto", "Helvetica Neue", sans-serif',
+  fontWeight: "600",
+  lineHeight: "1.2",
+  letterSpacing: "-0.02em",
+};
 
+// Professional Warm Analogous Color Scheme
+const primaryColor = "#D4A574";      // Warm Gold (primary brand)
+const secondaryColor = "#C8956D";    // Warm Amber (secondary)
+const accentColor = "#B8946A";       // Warm Bronze (accent)
+const tertiaryColor = "#E8C4A0";     // Light Warm Cream (tertiary)
+
+// Functional Colors
+const successColor = "#7D8F69";      // Warm Sage Green
+const warningColor = "#D49C3D";      // Professional Amber
+const dangerColor = "#C17B5B";       // Warm Terracotta Red
+const infoColor = "#8FA5A3";         // Muted Teal
+
+// Neutral Colors
+const grayColor = "#6B7280";         // Professional Gray
+const darkGrayColor = "#374151";     // Dark Text Gray
+const lightGrayColor = "#F3F4F6";    // Light Background Gray
+const whiteColor = "#FFFFFF";
+const blackColor = "#111827";        // Rich Black
+
+// Legacy color mapping for backward compatibility
+const roseColor = primaryColor;       // Map rose to primary
+
+// Professional Shadow System
 const primaryBoxShadow = {
   boxShadow:
-    "0 12px 20px -10px rgba(156, 39, 176, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(156, 39, 176, 0.2)",
+    "0 8px 16px -4px rgba(212, 165, 116, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(212, 165, 116, 0.15)",
 };
 const infoBoxShadow = {
   boxShadow:
-    "0 12px 20px -10px rgba(0, 188, 212, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(0, 188, 212, 0.2)",
+    "0 8px 16px -4px rgba(143, 165, 163, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(143, 165, 163, 0.15)",
 };
 const successBoxShadow = {
   boxShadow:
-    "0 12px 20px -10px rgba(76, 175, 80, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(76, 175, 80, 0.2)",
+    "0 8px 16px -4px rgba(125, 143, 105, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(125, 143, 105, 0.15)",
 };
 const warningBoxShadow = {
   boxShadow:
-    "0 12px 20px -10px rgba(255, 152, 0, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(255, 152, 0, 0.2)",
+    "0 8px 16px -4px rgba(212, 156, 61, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(212, 156, 61, 0.15)",
 };
 const dangerBoxShadow = {
   boxShadow:
-    "0 12px 20px -10px rgba(244, 67, 54, 0.28), 0 4px 20px 0px rgba(0, 0, 0, 0.12), 0 7px 8px -5px rgba(244, 67, 54, 0.2)",
+    "0 8px 16px -4px rgba(193, 123, 91, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(193, 123, 91, 0.15)",
 };
 const roseBoxShadow = {
   boxShadow:
-    "0 4px 20px 0px rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(233, 30, 99, 0.4)",
+    "0 8px 16px -4px rgba(212, 165, 116, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(212, 165, 116, 0.15)",
 };
 
 const warningCardHeader = {
   color: "#fff",
-  background: "linear-gradient(60deg, #ffa726, #fb8c00)",
+  background: "linear-gradient(135deg, #D49C3D, #C8956D)",
   ...warningBoxShadow,
 };
 const successCardHeader = {
   color: "#fff",
-  background: "linear-gradient(60deg, #66bb6a, #43a047)",
+  background: "linear-gradient(135deg, #7D8F69, #6B7A5A)",
   ...successBoxShadow,
 };
 const dangerCardHeader = {
   color: "#fff",
-  background: "linear-gradient(60deg, #ef5350, #e53935)",
+  background: "linear-gradient(135deg, #C17B5B, #B5694A)",
   ...dangerBoxShadow,
 };
 const infoCardHeader = {
   color: "#fff",
-  background: "linear-gradient(60deg, #26c6da, #00acc1)",
+  background: "linear-gradient(135deg, #8FA5A3, #7A9290)",
   ...infoBoxShadow,
 };
 const primaryCardHeader = {
   color: "#fff",
-  background: "linear-gradient(60deg, #ab47bc, #8e24aa)",
+  background: "linear-gradient(135deg, #D4A574, #C8956D)",
   ...primaryBoxShadow,
 };
 const roseCardHeader = {
   color: "#fff",
-  background: "linear-gradient(60deg, #ec407a, #d81b60)",
+  background: "linear-gradient(135deg, #D4A574, #C8956D)",
   ...roseBoxShadow,
 };
 const cardActions = {
@@ -156,11 +180,10 @@ const defaultBoxShadow = {
 };
 
 const title = {
-  color: "#3C4858",
+  color: darkGrayColor,
   margin: "1.75rem 0 0.875rem",
   textDecoration: "none",
-  fontWeight: "700",
-  fontFamily: `"Roboto Slab", "Times New Roman", serif`,
+  ...headingFont,
 };
 
 const cardTitle = {
@@ -187,26 +210,42 @@ export {
   containerFluid,
   boxShadow,
   card,
+  // Typography
   defaultFont,
+  headingFont,
+  // Professional Color Palette
   primaryColor,
+  secondaryColor,
+  accentColor,
+  tertiaryColor,
+  // Functional Colors
   warningColor,
   dangerColor,
   successColor,
   infoColor,
-  roseColor,
+  // Neutral Colors
   grayColor,
+  darkGrayColor,
+  lightGrayColor,
+  whiteColor,
+  blackColor,
+  // Legacy Colors
+  roseColor,
+  // Shadow System
   primaryBoxShadow,
   infoBoxShadow,
   successBoxShadow,
   warningBoxShadow,
   dangerBoxShadow,
   roseBoxShadow,
+  // Card Headers
   warningCardHeader,
   successCardHeader,
   dangerCardHeader,
   infoCardHeader,
   primaryCardHeader,
   roseCardHeader,
+  // Layout
   cardActions,
   cardHeader,
   defaultBoxShadow,

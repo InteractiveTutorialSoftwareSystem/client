@@ -13,7 +13,6 @@ import Button from "components/CustomButtons/Button.js";
 import Hidden from '@mui/material/Hidden';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
-import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 
 // material ui icon
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -23,6 +22,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 // tour
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
@@ -62,7 +63,8 @@ export default function TutorialPage(props) {
   const [refreshedLayout, setRefreshedLayout] = useState();
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [frequentWord, setFrequentWord] = useState([]);
-  const [tutorialSectionId, setTutorialSectionId] = useState(null)
+  const [tutorialSectionId, setTutorialSectionId] = useState(null);
+  const [layoutMenuAnchor, setLayoutMenuAnchor] = useState(null);
 
   const [description, setDescription] = useState("");
   const [inputIde, setInputIde] = useState("");
@@ -127,7 +129,7 @@ export default function TutorialPage(props) {
       hideBackButton: true,
     },
     {
-      content: <h4>Once done, you can save the current layout and load the saved layout for the rest of this tutorial. You can also restore to the default layout.</h4>,
+      content: <h4>Once done, you can use the Layout dropdown to save the current layout, load the saved layout for the rest of this tutorial, or restore to the default layout.</h4>,
       target: '#layout-button',
       spotlightClicks: true,
     },
@@ -429,15 +431,6 @@ export default function TutorialPage(props) {
     })
   }
 
-  const handleLayoutDropdown = (value) => {
-    if (value.props.children[1] == "Save Layout") {
-      saveLayout();
-    } else if (value.props.children[1] == "Load Saved Layout") {
-      layoutRef.current.loadLayout(learnerLayout)
-    } else if (value.props.children[1] == "Restore Layout") {
-      layoutRef.current.loadLayout(refreshedLayout)
-    }
-  }
 
   return (
     <div>
@@ -481,9 +474,9 @@ export default function TutorialPage(props) {
               </Tooltip>
             </div>
           </Grid>
-          <Grid item xs={3} sm={4} className={classes.gridHeaderRight}>
+          <Grid item xs={3} sm={4} className={classes.gridHeaderRight} style={{zIndex: 10001, position: 'relative'}}>
             {tutorialType == "Code" &&
-              <div className={classes.topRightIcon}>
+              <div className={classes.topRightIcon} style={{overflow: 'visible', position: 'relative'}}>
                 <Hidden smDown>
                   <Tooltip title="Search">
                     <Button id="search-button" onClick={() => setShowSearchModal(true)} id="search-button">
@@ -491,65 +484,54 @@ export default function TutorialPage(props) {
                       Search
                     </Button>
                   </Tooltip>
-                  <div id="layout-button">
-                    <CustomDropdown
-                      buttonText={"Layout"}
-                      dropdownList={[
-                        <span key="save-layout" className={classes.dropdownDetail}>
-                          <SaveIcon className={classes.dropdownIcon}/>
-                          Save Layout
-                        </span>,
-                        [
-                          <span key="load-layout" className={classes.dropdownDetail}>
-                            <ViewCompactIcon className={classes.dropdownIcon}/>
-                            Load Saved Layout
-                          </span>,
-                          learnerLayout == null
-                        ],
-                        <span key="restore-layout" className={classes.dropdownDetail}>
-                          <RefreshIcon className={classes.dropdownIcon}/>
-                          Restore Layout
-                        </span>,
-                      ]}
-                      onClick={(e) => handleLayoutDropdown(e)}
-                      right={true}
-                    />
-                  </div>
+                  <Tooltip title="Compile Code">
+                    <Button id="compile-code-button" onClick={() => window.handleCompileCode && window.handleCompileCode()} style={{backgroundColor: 'blue', color: 'white', margin: '0 5px'}}>
+                      <ViewCompactIcon/>
+                      Compile
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Run Code">
+                    <Button id="run-code-button" onClick={() => window.handleRunCode && window.handleRunCode()} style={{backgroundColor: 'green', color: 'white', margin: '0 5px'}}>
+                      <ArrowForwardIcon/>
+                      Run
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Layout Options">
+                    <Button id="layout-button" onClick={(e) => setLayoutMenuAnchor(e.currentTarget)} style={{backgroundColor: 'gray', color: 'white', margin: '0 2px'}}>
+                      <MoreHorizIcon/>
+                      Layout
+                    </Button>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={layoutMenuAnchor}
+                    open={Boolean(layoutMenuAnchor)}
+                    onClose={() => setLayoutMenuAnchor(null)}
+                    keepMounted
+                  >
+                    <MenuItem onClick={() => {saveLayout(); setLayoutMenuAnchor(null);}}>
+                      <SaveIcon style={{marginRight: 8}}/>
+                      Save Layout
+                    </MenuItem>
+                    <MenuItem 
+                      onClick={() => {layoutRef.current.loadLayout(learnerLayout); setLayoutMenuAnchor(null);}}
+                      disabled={learnerLayout == null}
+                    >
+                      <ViewCompactIcon style={{marginRight: 8}}/>
+                      Load Layout
+                    </MenuItem>
+                    <MenuItem onClick={() => {layoutRef.current.loadLayout(refreshedLayout); setLayoutMenuAnchor(null);}}>
+                      <RefreshIcon style={{marginRight: 8}}/>
+                      Restore Layout
+                    </MenuItem>
+                  </Menu>
                 </Hidden>
                 <Hidden mdUp>
                   <Tooltip title="Search">
                     <Button id="search-button" justIcon onClick={() => setShowSearchModal(true)} id="search-button"><SearchIcon/></Button>
                   </Tooltip>
-                  <div id="layout-button">
-                    <CustomDropdown
-                      id="layout-button"
-                      buttonProps={{
-                        justIcon: true,
-                      }}
-                      buttonText={<MoreHorizIcon />}
-                      caret={false}
-                      dropdownList={[
-                        <span key="save-layout-mobile" className={classes.dropdownDetail}>
-                          <SaveIcon className={classes.dropdownIcon}/>
-                          Save Layout
-                        </span>,
-                        [
-                          <span key="load-layout-mobile" className={classes.dropdownDetail}>
-                            <ViewCompactIcon className={classes.dropdownIcon}/>
-                            Load Saved Layout
-                          </span>,
-                          learnerLayout == null
-                        ],
-                        <span key="restore-layout-mobile" className={classes.dropdownDetail}>
-                          <RefreshIcon className={classes.dropdownIcon}/>
-                          Restore Layout
-                        </span>,
-                        
-                      ]}
-                      onClick={(e) => handleLayoutDropdown(e)}
-                      right={true}
-                    />
-                  </div>
+                  <Tooltip title="Layout Options">
+                    <Button justIcon onClick={(e) => setLayoutMenuAnchor(e.currentTarget)}><MoreHorizIcon/></Button>
+                  </Tooltip>
                 </Hidden>
                 <Hidden xsDown>
                   <Tooltip title="Start Tour">

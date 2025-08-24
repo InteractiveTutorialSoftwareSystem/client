@@ -39,7 +39,7 @@ export default function SideBar() {
         onClose={handleDrawerToggle}
       >
         <div className={classes.appResponsive}>
-          <HeaderLinks side={true} />
+          <HeaderLinks />
         </div>
       </Drawer>
     </div>

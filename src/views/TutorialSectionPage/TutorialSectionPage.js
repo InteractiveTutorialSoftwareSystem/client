@@ -16,11 +16,14 @@ import CheckIcon from '@mui/icons-material/Check';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import TextRotateUpIcon from '@mui/icons-material/TextRotateUp';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import BuildIcon from '@mui/icons-material/Build';
 
 import QuestionSection from './Sections/QuestionSection.js';
 import CodeSection from './Sections/CodeSection.js';
 
 import styles from "assets/jss/material-kit-react/views/tutorialSectionPage.js";
+import { successColor } from "assets/jss/material-kit-react.js";
 
 import sampleData from './Sections/sample.json'
 const {sampleQuestion} = sampleData;
@@ -41,6 +44,7 @@ export default function TutorialPage(props) {
   const [tourStart, setTourStart] = useState(false);
   const [preTourLayout, setPreTourLayout] = useState(null);
   const [refreshedLayout, setRefreshedLayout] = useState();
+  const [authorLayout, setAuthorLayout] = useState();
   const [typeChosen, setTypeChosen] = useState(null);
   const [tutorialId, setTutorialId] = useState("");
   const [tutorialType, setTutorialType] = useState("");
@@ -138,6 +142,13 @@ export default function TutorialPage(props) {
     setPreTourLayout(layoutRef.current.saveLayout());
     layoutRef.current.loadLayout(refreshedLayout);
   }
+
+  const saveLayout = () => {
+    const newLayout = layoutRef.current.saveLayout();
+    setAuthorLayout(newLayout);
+    localStorage.setItem(`author-layout-${id}`, JSON.stringify(newLayout));
+  }
+
 
   useEffect(() => {
     if (id) {
@@ -326,7 +337,7 @@ export default function TutorialPage(props) {
                     }
                   }}
                 />
-                <CheckIcon fontSize="small" style={{ marginLeft: "10px", cursor: "pointer", color: "green" }} onClick={() => {setEditTitleButton(false); setFilename(tutorialSectionTitle.replace(/[^A-Z0-9]/ig, '_').toLowerCase())}} />
+                <CheckIcon fontSize="small" style={{ marginLeft: "10px", cursor: "pointer", color: successColor }} onClick={() => {setEditTitleButton(false); setFilename(tutorialSectionTitle.replace(/[^A-Z0-9]/ig, '_').toLowerCase())}} />
               </div>
             )
             : (
@@ -338,13 +349,8 @@ export default function TutorialPage(props) {
           }
         </Grid>
         <Grid item xs={4} className={classes.gridHeaderRight}>
-          {typeChosen == "Code" &&
-            <Tooltip title="Start Tour">
-              <Button justIcon round color="warning" style={{margin: "3px 1px"}} onClick={()=>{setTourStart(true); setTourStartState();}}>?</Button>
-            </Tooltip>
-          }
           {typeChosen == "Question" && 
-            <div>
+            <>
               <Hidden xsDown>
                 <Button disabled={question} style={{margin: "3px 1px"}} onClick={() => handleQuestionChange(sampleQuestion)}>
                   Upload Sample
@@ -362,7 +368,7 @@ export default function TutorialPage(props) {
                   <Button id="preview-button" style={{margin: "3px 1px"}} justIcon className={classes.previewButton}><VisibilityIcon/></Button>
                 </Link>
               </Tooltip>
-            </div>
+            </>
           }
           <Hidden xsDown>
             <Button onClick={() => handleSaveTutorialSection()} disabled={recordStartState} style={{margin: "3px 1px"}}>

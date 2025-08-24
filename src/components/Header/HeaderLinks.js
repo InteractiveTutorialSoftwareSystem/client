@@ -10,15 +10,13 @@ import ListItem from "@mui/material/ListItem";
 // core components
 import Button from "components/CustomButtons/Button.js";
 
-import styles, { sideHeaderLink } from "assets/jss/material-kit-react/components/headerLinksStyle.js";
+import { sideHeaderLink } from "assets/jss/material-kit-react/components/headerLinksStyle.js";
 
+// Create styles outside component to prevent re-generation
+const useStyles = makeStyles(sideHeaderLink);
 
 export default function HeaderLinks(props) {
   const navigate = useNavigate();
-  var useStyles = makeStyles(styles)
-  if (props.side == true) {
-    useStyles = makeStyles(sideHeaderLink);
-  }
   const classes = useStyles();
   const [logged] = useAuth();
   return (logged?
@@ -47,7 +45,10 @@ export default function HeaderLinks(props) {
           className={classes.navLink}
           onClick={() => {
             logout();
-            navigate('/login');
+            // Clear any cached data
+            localStorage.removeItem('REACT_TOKEN_AUTH_KEY');
+            // Force a page refresh to clear all state
+            window.location.href = '/login';
           }}
         >
           Logout

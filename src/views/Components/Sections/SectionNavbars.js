@@ -61,6 +61,7 @@ export default function SectionNavbars() {
                   </ListItem>
                   <ListItem className={classes.listItem}>
                     <CustomDropdown
+                      left
                       buttonText="Dropdown"
                       dropdownHeader="Dropdown Header"
                       buttonProps={{

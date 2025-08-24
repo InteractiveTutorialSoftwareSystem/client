@@ -121,27 +121,47 @@ export default function AllTutorialsPage(props) {
   }
 
   useEffect(() => {
-    if (props.role == "author") {
-      const authorRequestOptions = {
-        method: 'GET',
-      };
-      fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorials/get/' + props.userId, authorRequestOptions).then(response => {
-        return response.json();
-      }).then(response => {
-        setTutorials(response.tutorials);
-        setCreateTutorialButton(true);
-      });
-    } else if (props.role == "learner") {
-      const learnerRequestOptions = {
-        method: 'GET',
-      };
-      fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorials/get_all/' + props.userId, learnerRequestOptions).then(response => {
-        return response.json();
-      }).then(response => {
-        setTutorials(response.tutorials); 
-      });
-    }
-  }, []);
+    const loadTutorials = async () => {
+      try {
+        if (props.role == "author") {
+          const authorRequestOptions = {
+            method: 'GET',
+          };
+          const response = await fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorials/get/' + props.userId, authorRequestOptions);
+          
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          setTutorials(data.tutorials || []);
+          setCreateTutorialButton(true);
+        } else if (props.role == "learner") {
+          const learnerRequestOptions = {
+            method: 'GET',
+          };
+          const response = await fetch(process.env.REACT_APP_TUTORIAL_URL + '/tutorials/get_all/' + props.userId, learnerRequestOptions);
+          
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          setTutorials(data.tutorials || []); 
+        }
+      } catch (error) {
+        console.error('Failed to load tutorials:', error);
+        // Set empty tutorials array to prevent infinite loading
+        setTutorials([]);
+        // Still show create tutorial button for authors even if API fails
+        if (props.role === "author") {
+          setCreateTutorialButton(true);
+        }
+      }
+    };
+
+    loadTutorials();
+  }, [props.role, props.userId]);
     
 
   return (
@@ -150,7 +170,7 @@ export default function AllTutorialsPage(props) {
         absolute
         color="transparent"
         brand="Interactive Tutorial System"
-        rightLinks={<HeaderLinks />}
+        leftLinks={<HeaderLinks />}
         {...rest}
       />
       <div

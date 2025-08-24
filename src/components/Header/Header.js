@@ -8,7 +8,6 @@ import { makeStyles } from "@mui/styles";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
 // @mui/icons-material
 import Menu from "@mui/icons-material/Menu";
@@ -59,12 +58,10 @@ export default function Header(props) {
     [classes.absolute]: absolute,
     [classes.fixed]: fixed,
   });
-  const brandComponent = <Button href="/" className={classes.title}>{brand}</Button>;
+  const brandComponent = <a href="/" className={classes.title}>{brand}</a>;
   return (
     <AppBar className={appBarClasses}>
       <Toolbar className={classes.container}>
-        <div style={{width: '48px'}}></div>
-        {brandComponent}
         <IconButton
           color="inherit"
           aria-label="open drawer"
@@ -72,10 +69,12 @@ export default function Header(props) {
         >
           <Menu />
         </IconButton>
+        {brandComponent}
+        <div style={{width: '48px'}}></div>
       </Toolbar>
       <Drawer
         variant="temporary"
-        anchor={"right"}
+        anchor={"left"}
         open={mobileOpen}
         classes={{
           paper: classes.drawerPaper,

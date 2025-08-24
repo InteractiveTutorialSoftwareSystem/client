@@ -12,22 +12,24 @@ import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
-import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 import Snackbar from '@mui/material/Snackbar';
 import SnackbarContent from "components/Snackbar/SnackbarContent.js";
 import Tooltip from "@mui/material/Tooltip";
-import TextField from '@mui/material/TextField';
+import CustomInput from "components/CustomInput/CustomInput.js";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import styled from "styled-components";
 
 import styles from "assets/jss/material-kit-react/views/tutorialOverviewPage.js";
+import { infoColor, grayColor } from "assets/jss/material-kit-react.js";
 
 // Modal
-// Slide import removed as it's not used
-import Modal from 'react-bootstrap/Modal';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import IconButton from "@mui/material/IconButton";
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
@@ -35,6 +37,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import CodeIcon from '@mui/icons-material/Code';
 import Check from "@mui/icons-material/Check";
+import Close from "@mui/icons-material/Close";
 
 import InfoIcon from '@mui/icons-material/Info';
 import image from "assets/img/bg7.jpg";
@@ -42,14 +45,14 @@ import image from "assets/img/bg7.jpg";
 const useStyles = makeStyles(styles);
 
 const Container = styled.div`
-  border: 1px solid #ddd;
+  border: 1px solid ${grayColor};
   border-radius: 3px;
   padding: 8px;
 `;
 
 const Item = styled.div`
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid ${grayColor};
   border-radius: 3px;
   margin-bottom: 8px;
 `;
@@ -62,6 +65,8 @@ const Item = styled.div`
 
 export default function TutorialOverviewPage(props) {
   const [unorderedSequence, setUnorderedSequence] = useState(null);
+  const [createMenuAnchor, setCreateMenuAnchor] = useState(null);
+  const [languageMenuAnchor, setLanguageMenuAnchor] = useState(null);
   const [orderedSequence, setOrderedSequence] = useState(null);
   
   const classes = useStyles();
@@ -319,7 +324,7 @@ export default function TutorialOverviewPage(props) {
         absolute
         color="transparent"
         brand="Interactive Tutorial System"
-        rightLinks={<HeaderLinks />}
+        leftLinks={<HeaderLinks />}
         {...rest}
       />
       <div
@@ -355,11 +360,30 @@ export default function TutorialOverviewPage(props) {
                   <GridContainer>
                     <GridItem xs={12} sm={6} className={classes.cardSubHeading}>
                       <h4 style={{ marginRight: "10px" }}>Language used</h4>
-                      <CustomDropdown
-                        buttonText={languageChosen ? languageChosen : "Choose Language"}
-                        dropdownList={languageList}
-                        onClick={(e) => {handleLanguageChange(e)}}
-                      />
+                      <Button 
+                        onClick={(e) => setLanguageMenuAnchor(e.currentTarget)}
+                        style={{textTransform: 'none'}}
+                      >
+                        {languageChosen ? languageChosen : "Choose Language"}
+                      </Button>
+                      <Menu
+                        anchorEl={languageMenuAnchor}
+                        open={Boolean(languageMenuAnchor)}
+                        onClose={() => setLanguageMenuAnchor(null)}
+                        keepMounted
+                      >
+                        {languageList.map((language) => (
+                          <MenuItem 
+                            key={language}
+                            onClick={() => {
+                              handleLanguageChange(language); 
+                              setLanguageMenuAnchor(null);
+                            }}
+                          >
+                            {language}
+                          </MenuItem>
+                        ))}
+                      </Menu>
                     </GridItem>
                   </GridContainer>
                   <GridContainer className={classes.sequenceHeaderContainer}>
@@ -377,41 +401,47 @@ export default function TutorialOverviewPage(props) {
                           placement="right"
                           classes={{ tooltip: classes.tooltip }}
                         >
-                          <InfoIcon style={{ color: "#00acc1", marginLeft: "10px" }}/>
+                          <InfoIcon style={{ color: infoColor, marginLeft: "10px" }}/>
                         </Tooltip>
                       </h5>
                     </GridItem>
                     <GridItem xs={12} sm={6} className={classes.tutorialSequenceHeaderRight}>
-                      {orderedSequence
-                        ? (
-                          <Link to={"/tutorial/" + id + "/1"} target="_blank">
-                            <Button>
+                      <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                        {orderedSequence
+                          ? (
+                            <Link to={"/tutorial/" + id + "/1"} target="_blank">
+                              <Button>
+                                Preview
+                              </Button>
+                            </Link>
+                          ) : (
+                            <Button disabled>
                               Preview
                             </Button>
-                          </Link>
-                        ) : (
-                          <Button disabled>
-                            Preview
-                          </Button>
-                        )
-                      }
-                      <CustomDropdown
-                        buttonProps={{
-                          color: "primary"
-                        }}
-                        buttonText={"Create Section"}
-                        dropdownList={[
-                          <span key="create-code" className={classes.dropdownDetail}>
-                            <CodeIcon className={classes.dropdownIcon}/>
-                            Create Code
-                          </span>,
-                          <span key="create-question" className={classes.dropdownDetail}>
-                            <QuestionAnswerIcon className={classes.dropdownIcon}/>
-                            Create Question
-                          </span>
-                        ]}
-                        onClick={(e) => handleCreateSection(e)}
-                      />
+                          )
+                        }
+                        <Button 
+                          color="primary" 
+                          onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+                        >
+                          Create Section
+                        </Button>
+                      </div>
+                      <Menu
+                        anchorEl={createMenuAnchor}
+                        open={Boolean(createMenuAnchor)}
+                        onClose={() => setCreateMenuAnchor(null)}
+                        keepMounted
+                      >
+                        <MenuItem onClick={(e) => {handleCreateSection(e); setCreateMenuAnchor(null);}}>
+                          <CodeIcon style={{marginRight: 8}}/>
+                          Create Code
+                        </MenuItem>
+                        <MenuItem onClick={(e) => {handleCreateSection(e); setCreateMenuAnchor(null);}}>
+                          <QuestionAnswerIcon style={{marginRight: 8}}/>
+                          Create Question
+                        </MenuItem>
+                      </Menu>
                     </GridItem>
                   </GridContainer>
 
@@ -482,64 +512,111 @@ export default function TutorialOverviewPage(props) {
           </GridContainer>
 
           {/* Delete tutorial modal */}
-          <Modal show={deleteTutorialModal} onHide={() => setDeleteTutorialModal(false)} centered>
-            <Modal.Header id="classic-modal-slide-title" className={classes.modalHeader} closeButton>
-              <h5>Do you want to delete this tutorial?</h5>
-            </Modal.Header>
-            <Modal.Footer className={classes.modalFooter + " " + classes.modalFooterCenter}>
-              <Button onClick={() => setDeleteTutorialModal(false)}>No</Button>
-              <Button onClick={() => handleTutorialDelete()} color="danger">Delete</Button>
-            </Modal.Footer>
+          <Modal open={deleteTutorialModal} onClose={() => setDeleteTutorialModal(false)}>
+            <Box style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              backgroundColor: '#fff',
+              border: '1px solid #ccc',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              padding: '32px'
+            }}>
+              <div id="classic-modal-slide-title" className={classes.modalHeader}>
+                <h5>Do you want to delete this tutorial?</h5>
+              </div>
+              <div className={classes.modalFooter + " " + classes.modalFooterCenter} style={{marginTop: '20px'}}>
+                <Button onClick={() => setDeleteTutorialModal(false)}>No</Button>
+                <Button onClick={() => handleTutorialDelete()} color="danger">Delete</Button>
+              </div>
+            </Box>
           </Modal>
 
           {/* Delete tutorial section modal */}
-          <Modal show={deleteTutorialSectionModal} onHide={() => setDeleteTutorialSectionModal(false)} centered>
-            <Modal.Header id="classic-modal-slide-title" className={classes.modalHeader} closeButton>
-              {deleteTutorialSection
-                  ? <h5>Do you want to delete {deleteTutorialSection.name}?</h5>
-                  : null
-                }
-            </Modal.Header>
-            <Modal.Footer className={classes.modalFooter + " " + classes.modalFooterCenter}>
-              <Button onClick={() => {setDeleteTutorialSectionModal(false); setDeleteTutorialSection(null);}}>No</Button>
-              <Button onClick={() => handleTutorialSectionDeleteButton()} color="danger">Delete</Button>
-            </Modal.Footer>
+          <Modal open={deleteTutorialSectionModal} onClose={() => setDeleteTutorialSectionModal(false)}>
+            <Box style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              backgroundColor: '#fff',
+              border: '1px solid #ccc',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              padding: '32px'
+            }}>
+              <div id="classic-modal-slide-title" className={classes.modalHeader}>
+                {deleteTutorialSection
+                    ? <h5>Do you want to delete {deleteTutorialSection.name}?</h5>
+                    : null
+                  }
+              </div>
+              <div className={classes.modalFooter + " " + classes.modalFooterCenter} style={{marginTop: '20px'}}>
+                <Button onClick={() => {setDeleteTutorialSectionModal(false); setDeleteTutorialSection(null);}}>No</Button>
+                <Button onClick={() => handleTutorialSectionDeleteButton()} color="danger">Delete</Button>
+              </div>
+            </Box>
           </Modal>
 
           {/* Show Tutorial Modal */}
-          <Modal show={showTutorialModal} onHide={() => setShowTutorialModal(false)} centered size="lg">
-            <Modal.Header id="classic-modal-slide-title" className={classes.modalHeader} closeButton><Modal.Title></Modal.Title></Modal.Header>
-            <Modal.Body id="modal-slide-description" className={classes.modalBody}>
+          <Modal open={showTutorialModal} onClose={() => setShowTutorialModal(false)}>
+            <Box style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90%',
+              maxWidth: '800px',
+              maxHeight: '90vh',
+              backgroundColor: '#fff',
+              border: '1px solid #ccc',
+              borderRadius: '12px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              overflow: 'auto'
+            }}>
+              <div id="classic-modal-slide-title" className={classes.modalHeader}>
+                <IconButton
+                  onClick={() => setShowTutorialModal(false)}
+                  style={{ position: 'absolute', right: 8, top: 8 }}
+                >
+                  <Close />
+                </IconButton>
+              </div>
+              <div id="modal-slide-description" className={classes.modalBody}>
               <GridContainer>
                 <GridItem xs={12} sm={6}>
-                  <TextField
-                    id="datetime-local"
-                    label="Start Date"
-                    type="datetime-local"
-                    value={startDatetime}
-                    className={classes.dateTime}
-                    InputLabelProps={{
-                      shrink: true,
+                  <CustomInput
+                    labelText="Start Date"
+                    id="start-datetime"
+                    formControlProps={{
+                      fullWidth: true,
+                      className: classes.dateTime
                     }}
                     inputProps={{
+                      type: "datetime-local",
+                      value: startDatetime,
                       onChange: (e) => setStartDatetime(format(parseISO(e.target.value), "yyyy-MM-dd'T'HH:mm"))
                     }}
                   />
                 </GridItem>
                 <GridItem xs={12} sm={6}>
-                  <TextField
-                    id="datetime-local"
-                    label="End Date"
-                    type="datetime-local"
-                    value={endDatetime}
-                    className={classes.dateTime}
-                    InputLabelProps={{
-                      shrink: true,
+                  <CustomInput
+                    labelText="End Date"
+                    id="end-datetime"
+                    formControlProps={{
+                      fullWidth: true,
+                      className: classes.dateTime
                     }}
                     inputProps={{
-                      onChange: (e) => setEndDatetime(format(parseISO(e.target.value), "yyyy-MM-dd'T'HH:mm"))
+                      type: "datetime-local",
+                      value: endDatetime,
+                      onChange: (e) => setEndDatetime(format(parseISO(e.target.value), "yyyy-MM-dd'T'HH:mm")),
+                      disabled: withoutEndDate
                     }}
-                    disabled={withoutEndDate}
                   />
                   <FormControlLabel
                     control={
@@ -558,11 +635,12 @@ export default function TutorialOverviewPage(props) {
                 </GridItem>
               </GridContainer>
               <p style={{color: "red"}}>{dateErrorMessage}</p>
-            </Modal.Body>
-            <Modal.Footer className={classes.modalFooter}>
-              <Button onClick={() => {setShowTutorialModal(false);}}>Cancel</Button>
-              <Button onClick={() => handleSaveShowTutorialDate()} color="success">Show</Button>
-            </Modal.Footer>
+              </div>
+              <div className={classes.modalFooter} style={{padding: '20px'}}>
+                <Button onClick={() => {setShowTutorialModal(false);}}>Cancel</Button>
+                <Button onClick={() => handleSaveShowTutorialDate()} color="success">Show</Button>
+              </div>
+            </Box>
           </Modal>
 
           {/* Error message for save sequence with no tutorial section */}

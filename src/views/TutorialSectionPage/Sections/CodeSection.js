@@ -14,10 +14,11 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 // core components
 import Button from "components/CustomButtons/Button.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
-import CustomDropdown from "components/CustomDropdown/CustomDropdown.js";
 // material ui icon
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import StopIcon from '@mui/icons-material/Stop';
@@ -31,6 +32,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import TextRotateUpIcon from '@mui/icons-material/TextRotateUp';
 import ErrorIcon from '@mui/icons-material/Error';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import BuildIcon from '@mui/icons-material/Build';
 
 import sampleData from './sample.json'
 const {sampleDescription, sampleInput, samplePythonCode, sampleJavaCode, sampleJavaScriptCode} = sampleData;
@@ -46,7 +48,8 @@ import AudioReactRecorder, { RecordState } from "../../../components/AudioReactR
 
 // Modal
 import Slide from "@mui/material/Slide";
-import Modal from 'react-bootstrap/Modal';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 import IconButton from "@mui/material/IconButton";
 import Hidden from '@mui/material/Hidden';
 
@@ -60,6 +63,7 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import {decode} from 'html-entities';
 
 import styles from "assets/jss/material-kit-react/views/tutorialSectionPageSections/codeStyle.js";
+import { grayColor } from "assets/jss/material-kit-react.js";
 
 const useStyles = makeStyles(styles);
 
@@ -76,6 +80,7 @@ export default function TutorialPage(props) {
   const { ...rest } = props;
 
   const [authorLayout, setAuthorLayout] = useState();
+  const [layoutMenuAnchor, setLayoutMenuAnchor] = useState(null);
   const [themeChosen, setThemeChosen] = useState("github");
   const [recordState, setRecordState] = useState(null);
   const [audioData, setAudioData] = useState(null);
@@ -100,6 +105,7 @@ export default function TutorialPage(props) {
   const [getMediaError, setGetMediaError] = useState("");
   const [backdropOpen, setBackdropOpen] = useState(false);
   const [showCodeRun, setShowCodeRun] = useState(true);
+  const [showCompile, setShowCompile] = useState(true);
   const [transcriptResult, setTranscriptResult] = useState([]);
   const [transcriptResultSlice, setTranscriptResultSlice] = useState(0);
   const [interimResultTime, setInterimResultTime] = useState(null);
@@ -277,16 +283,7 @@ export default function TutorialPage(props) {
                           Ln {value.editorCursor[0]}, Col {value.editorCursor[1]} | Spaces: 4 | Filename: {value.filename}
                         </div>}
                       </Context.Consumer>
-                      <Context.Consumer>
-                        {(value) => value.showCodeRun
-                          ? (
-                            <Button round className={classes.codeButton} onClick={() => {handleRunCode(value.filename); setRandom(value.random + 1)}} color="success">
-                              <PlayArrowIcon />
-                              Run code
-                            </Button>
-                          ) : <CircularProgress className={classes.spinner}/>
-                        }
-                      </Context.Consumer>
+                      {/* Run and Compile buttons moved to top-right header */}
                     </div>
                   )
                 },
@@ -831,6 +828,54 @@ export default function TutorialPage(props) {
       });
   }
 
+  const handleCompileCode = (filename) => {
+    if (!consoleIdeRef.current) {
+      return
+    }
+    const ide = editorRef.current.editor.getValue();
+    setShowCompile(false);
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ data: ide, filename })
+    };
+
+    fetch(process.env.REACT_APP_TUTORIAL_URL + '/compile_script/' + props.languageChosen, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        let newResult = consoleIdeRef.current.editor.getValue() + "> " + data.output;
+        if (data.time) {
+          newResult += "> Compile time: " + (Math.ceil(data.time * 1000)/1000).toFixed(3) + "s\n";
+        }
+        consoleIdeRef.current.editor.setValue(newResult);
+        consoleIdeRef.current.editor.clearSelection();
+        consoleIdeRef.current.editor.session.setScrollTop(9999999);
+        
+        // Set console error if compilation failed
+        if (!data.success && data.output) {
+          const output = data.output.toLowerCase();
+          if (output.includes("error") || output.includes("exception")) {
+            const sentenceArray = output.split("\n")
+            for (const sentence of sentenceArray) {
+              if (sentence.includes("error") || sentence.includes("exception")) {
+                let consoleErrorString = ""
+                for (const word of sentence.split(" ")) {
+                  if (props.languageChosen == "java") {
+                    if (word.includes("error") || word.includes("exception")) {
+                      consoleErrorString += word + " ";
+                    }
+                  }
+                }
+                setConsoleError(consoleErrorString);
+              }
+            }
+          }
+        } else {
+          setConsoleError("");
+        }
+        setShowCompile(true);
+      });
+  }
+
   const handleSaveRecording = async () => {
     // save recording
     setBackdropOpen(true)
@@ -1013,8 +1058,21 @@ export default function TutorialPage(props) {
   }
 
   return (
-    <div style={{width: "100%"}}>
-      <Grid item xs={12} className={classes.gridHeader}>
+    <Context.Provider 
+      value={{
+        showCodeRun,
+        showCompile,
+        "description": props.description,
+        ide,
+        random,
+        editorCursor,
+        "filename": props.filename,
+        consoleError,
+        handlePreSearch
+      }}
+    >
+      <div style={{width: "100%"}}>
+        <Grid item xs={12} className={classes.gridHeader}>
         <div className={classes.gridHeaderButton}>
           <div>
             <input
@@ -1140,75 +1198,101 @@ export default function TutorialPage(props) {
             </div>
           )}
         </div>
-        <div style={{display: 'inline-flex'}}>
+        <div style={{display: 'inline-flex', alignItems: 'center', gap: '8px'}}>
+          {/* DEBUG: Primary Action Buttons - Execute Group */}
+          <Context.Consumer>
+            {(value) => {
+              console.log('DEBUG: showCodeRun =', value.showCodeRun);
+              console.log('DEBUG: showCompile =', value.showCompile);
+              console.log('DEBUG: filename =', value.filename);
+              return value.showCodeRun ? (
+                <Button 
+                  round 
+                  color="success" 
+                  onClick={() => {handleRunCode(value.filename); setRandom(value.random + 1)}}
+                  style={{backgroundColor: 'green', color: 'white'}}
+                >
+                  <PlayArrowIcon />
+                  <Hidden xsDown>Run</Hidden>
+                </Button>
+              ) : (
+                <Button disabled round color="success" style={{backgroundColor: 'gray'}}>
+                  <CircularProgress size={20} />
+                  <Hidden xsDown>Run</Hidden>
+                </Button>
+              );
+            }}
+          </Context.Consumer>
+          
+          <Context.Consumer>
+            {(value) => value.showCompile ? (
+              <Button 
+                round 
+                color="primary" 
+                onClick={() => handleCompileCode(value.filename)}
+                style={{backgroundColor: 'blue', color: 'white'}}
+              >
+                <BuildIcon />
+                <Hidden xsDown>Compile</Hidden>
+              </Button>
+            ) : (
+              <Button disabled round color="primary" style={{backgroundColor: 'lightblue'}}>
+                <CircularProgress size={20} />
+                <Hidden xsDown>Compile</Hidden>
+              </Button>
+            )}
+          </Context.Consumer>
+
+          {/* Divider */}
+          <div style={{ width: '1px', height: '32px', backgroundColor: grayColor, margin: '0 4px' }} />
+
+          {/* Helper Actions */}
           <Hidden xsDown>
-            <Button onClick={handlePreSearch} id="search-button">
+            <Button onClick={handlePreSearch} size="sm">
               <SearchIcon/>
               Search
             </Button>
-            <div id="save-load-layout-buttons">
-              <CustomDropdown
-                buttonText={"Layout"}
-                dropdownList={[
-                  <span key="save-layout-author" className={classes.dropdownDetail}>
-                    <SaveIcon className={classes.dropdownIcon}/>
-                    Save Layout
-                  </span>,
-                  [
-                    <span key="load-layout-author" className={classes.dropdownDetail}>
-                      <ViewCompactIcon className={classes.dropdownIcon}/>
-                      Load Saved Layout
-                    </span>,
-                    authorLayout == null || props.recordStartState
-                  ],
-                  [
-                    <span key="restore-layout-author" className={classes.dropdownDetail}>
-                      <RefreshIcon className={classes.dropdownIcon}/>
-                      Restore Layout
-                    </span>,
-                    props.recordStartState
-                  ]
-                ]}
-                onClick={(e) => handleLayoutDropdown(e)}
-                right={true}
-              />
-            </div>
+            <Tooltip title="Layout Options">
+              <Button onClick={(e) => setLayoutMenuAnchor(e.currentTarget)} style={{backgroundColor: 'gray', color: 'white'}}>
+                <MoreHorizIcon/>
+                Layout
+              </Button>
+            </Tooltip>
+            <Menu
+              anchorEl={layoutMenuAnchor}
+              open={Boolean(layoutMenuAnchor)}
+              onClose={() => setLayoutMenuAnchor(null)}
+              keepMounted
+            >
+              <MenuItem onClick={() => {saveLayout(); setLayoutMenuAnchor(null);}}>
+                <SaveIcon style={{marginRight: 8}}/>
+                Save Layout
+              </MenuItem>
+              <MenuItem 
+                onClick={() => {props.layoutRef.current.loadLayout(authorLayout); setLayoutMenuAnchor(null);}}
+                disabled={authorLayout == null || props.recordStartState}
+              >
+                <ViewCompactIcon style={{marginRight: 8}}/>
+                Load Layout
+              </MenuItem>
+              <MenuItem 
+                onClick={() => {props.layoutRef.current.loadLayout(props.refreshedLayout); setLayoutMenuAnchor(null);}}
+                disabled={props.recordStartState}
+              >
+                <RefreshIcon style={{marginRight: 8}}/>
+                Restore Layout
+              </MenuItem>
+            </Menu>
           </Hidden>
           <Hidden smUp>
             <Tooltip title="Search">
-              <Button justIcon onClick={handlePreSearch} id="search-button"><SearchIcon/></Button>
+              <Button justIcon onClick={handlePreSearch}><SearchIcon/></Button>
             </Tooltip>
-            <div id="save-load-layout-buttons">
-              <CustomDropdown
-                buttonProps={{
-                  justIcon: true,
-                }}
-                buttonText={<MoreHorizIcon />}
-                caret={false}
-                dropdownList={[
-                  <span key="save-layout-author-mobile" className={classes.dropdownDetail}>
-                    <SaveIcon className={classes.dropdownIcon}/>
-                    Save Layout
-                  </span>,
-                  [
-                    <span key="load-layout-author-mobile" className={classes.dropdownDetail}>
-                      <ViewCompactIcon className={classes.dropdownIcon}/>
-                      Load Saved Layout
-                    </span>,
-                    authorLayout == null || props.recordStartState
-                  ],
-                  [
-                    <span key="restore-layout-author-mobile" className={classes.dropdownDetail}>
-                      <RefreshIcon className={classes.dropdownIcon}/>
-                      Restore Layout
-                    </span>,
-                    props.recordStartState
-                  ]
-                ]}
-                onClick={(e) => handleLayoutDropdown(e)}
-                right={true}
-              />
-            </div>
+            <Tooltip title="Layout Options">
+              <Button justIcon onClick={(e) => setLayoutMenuAnchor(e.currentTarget)}>
+                <MoreHorizIcon/>
+              </Button>
+            </Tooltip>
           </Hidden>
         </div>
       </Grid>
@@ -1217,6 +1301,7 @@ export default function TutorialPage(props) {
         <Context.Provider 
           value={{
             showCodeRun,
+            showCompile,
             "description": props.description,
             ide,
             random,
@@ -1236,22 +1321,55 @@ export default function TutorialPage(props) {
       </Grid>
       
       {/* Save Recording Modal */}
-      <Modal show={showRecordingModal} onHide={() => setShowRecordingModal(false)} centered>
-        <Modal.Header id="classic-modal-slide-title" className={classes.modalHeader} closeButton>
-          <h5>Do you want to save this recording?</h5>
-        </Modal.Header>
-        <Modal.Footer className={classes.modalFooter + " " + classes.modalFooterCenter}>
-          <Button onClick={() => setShowRecordingModal(false)}>No</Button>
-          <Button onClick={() => handleSaveRecording()} color="success">Yes</Button>
-        </Modal.Footer>
+      <Modal open={showRecordingModal} onClose={() => setShowRecordingModal(false)}>
+        <Box style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          backgroundColor: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          padding: '32px'
+        }}>
+          <div id="classic-modal-slide-title" className={classes.modalHeader}>
+            <h5>Do you want to save this recording?</h5>
+          </div>
+          <div className={classes.modalFooter + " " + classes.modalFooterCenter} style={{marginTop: '20px'}}>
+            <Button onClick={() => setShowRecordingModal(false)}>No</Button>
+            <Button onClick={() => handleSaveRecording()} color="success">Yes</Button>
+          </div>
+        </Box>
       </Modal>
 
       {/* Search Dialog */}
-      <Modal show={showSearchModal} onHide={() => setShowSearchModal(false)} centered dialogClassName="searchModal" scrollable={true} size='xl'>
-        <Modal.Header closeButton id="classic-modal-slide-title" className={classes.modalHeader}>
-          <Modal.Title>Search</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className={classes.searchModal}>
+      <Modal open={showSearchModal} onClose={() => setShowSearchModal(false)}>
+        <Box style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: '1200px',
+          maxHeight: '90vh',
+          backgroundColor: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          overflow: 'auto'
+        }}>
+          <div id="classic-modal-slide-title" className={classes.modalHeader}>
+            <h4>Search</h4>
+            <IconButton
+              onClick={() => setShowSearchModal(false)}
+              style={{ position: 'absolute', right: 8, top: 8 }}
+            >
+              ✕
+            </IconButton>
+          </div>
+          <div className={classes.searchModal}>
           <CustomInput
             id="regular"
             inputProps={{
@@ -1329,13 +1447,15 @@ export default function TutorialPage(props) {
               )
             }
           </div>
-        </Modal.Body>
+          </div>
+        </Box>
       </Modal>
 
       <Backdrop className={classes.backdrop} open={backdropOpen}>
         <CircularProgress />
       </Backdrop>
-    </div>
+      </div>
+    </Context.Provider>
   );
 }
 

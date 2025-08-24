@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { login, useAuth } from "../../auth";
 import { useNavigate, Navigate } from "react-router-dom";
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, useGoogleOneTapLogin } from '@react-oauth/google';
 // @mui/material components
 import { makeStyles } from "@mui/styles";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import InputAdornment from "@mui/material/InputAdornment";
-import Snackbar from '@mui/material/Snackbar';
 import Icon from "@mui/material/Icon";
+import ErrorHandler from "components/ErrorHandler/ErrorHandler.js";
 // @mui/icons-material
 import Email from "@mui/icons-material/Email";
 // core components
@@ -23,7 +23,6 @@ import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardFooter from "components/Card/CardFooter.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
-import SnackbarContent from "components/Snackbar/SnackbarContent.js";
 
 import styles from "assets/jss/material-kit-react/views/loginPage.js";
 
@@ -40,8 +39,8 @@ export default function LoginPage(props) {
   const [role, setRole] = React.useState("learner");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [open, setOpen] = React.useState(false);
-  const [errorMsg, setErrorMsg] = React.useState('Please try again');
+  const [errorOpen, setErrorOpen] = React.useState(false);
+  const [currentError, setCurrentError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
 
   const [logged] = useAuth();
@@ -98,24 +97,28 @@ export default function LoginPage(props) {
             }
           }
           else {
-            setErrorMsg(token.message || "Login failed");
+            setErrorMsg("Login failed, please try again");
             setOpen(true);
           }
       })
-      .catch(() => {
+      .catch((error) => {
         setLoading(false);
-        // Handle login error silently
-        setErrorMsg("Network error. Please check your connection and try again.");
-        setOpen(true);
+        setCurrentError(error);
+        setErrorOpen(true);
       });
     } else {
-      setErrorMsg("Please input all credentials");
-      setOpen(true);
+      setCurrentError(new Error("Please input all credentials"));
+      setErrorOpen(true);
     }
   }
 
   const googleLogin = (credentialResponse) => {
     // Handles Google login when Google setup successful
+    setLoading(true);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     fetch(process.env.REACT_APP_AUTH_URL + '/oauth/login', {
       method: 'post',
       headers: {
@@ -124,8 +127,11 @@ export default function LoginPage(props) {
       body: JSON.stringify({
         'token': credentialResponse.credential,
         role,
-      })
+      }),
+      signal: controller.signal
     }).then(r => {
+      clearTimeout(timeoutId);
+      setLoading(false);
       if (!r.ok) {
         throw new Error(`HTTP error! status: ${r.status}`);
       }
@@ -141,29 +147,46 @@ export default function LoginPage(props) {
           }
         }
         else {
-          setErrorMsg(token.message || "Google Login failed");
-          setOpen(true);
+          setCurrentError(new Error("Login failed. Please check your credentials."));
+          setErrorOpen(true);
         }
     })
-    .catch(() => {
-      // Handle Google login error silently
-      setErrorMsg("Google login failed. Please try again.");
-      setOpen(true);
+    .catch((error) => {
+      clearTimeout(timeoutId);
+      setLoading(false);
+      if (error.name === 'AbortError') {
+        setCurrentError(new Error("Google login timeout. Please try again."));
+      } else {
+        setCurrentError(new Error("Google login failed. Please try again or use credentials."));
+      }
+      setErrorOpen(true);
     })
   };
+
+  // Check if Google OAuth is available
+  const isGoogleOAuthAvailable = process.env.REACT_APP_GOOGLE_CLIENT_ID && 
+                                process.env.REACT_APP_GOOGLE_CLIENT_ID !== 'undefined';
 
   // Note: onFailure function removed as it's not used with the current Google Login setup
 
   const onGuestClick = (e) => {
     // Handles guest login
     e.preventDefault();
+    setLoading(true);
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    
     fetch(process.env.REACT_APP_AUTH_URL + '/guest/login', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({'role': e.currentTarget.getAttribute('data-role')})
+      body: JSON.stringify({'role': e.currentTarget.getAttribute('data-role')}),
+      signal: controller.signal
     }).then(r => {
+      clearTimeout(timeoutId);
+      setLoading(false);
       if (!r.ok) {
         throw new Error(`HTTP error! status: ${r.status}`);
       }
@@ -179,19 +202,39 @@ export default function LoginPage(props) {
           }
         }
         else {
-          setErrorMsg(token.message || "Guest login failed");
-          setOpen(true);
+          setCurrentError(new Error(token.message || "Guest login failed"));
+          setErrorOpen(true);
         }
     })
-    .catch(() => {
-      // Handle guest login error silently
-      setErrorMsg("Guest login failed. Please try again.");
-      setOpen(true);
+    .catch((error) => {
+      clearTimeout(timeoutId);
+      setLoading(false);
+      if (error.name === 'AbortError') {
+        setCurrentError(new Error("Guest login timeout. Please check your connection."));
+      } else {
+        setCurrentError(new Error("Guest login failed. Please try again."));
+      }
+      setErrorOpen(true);
     });
   }
 
+  // Add a small delay to ensure logout has fully completed
+  const [shouldRedirect, setShouldRedirect] = React.useState(false);
+  
+  React.useEffect(() => {
+    if (logged) {
+      // Small delay to ensure state is stable
+      const timer = setTimeout(() => {
+        setShouldRedirect(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setShouldRedirect(false);
+    }
+  }, [logged]);
+  
   return (
-    logged?<Navigate to='/tutorial' />:
+    shouldRedirect ? <Navigate to='/tutorial' /> :
     <div>
       <Header
         absolute
@@ -221,7 +264,13 @@ export default function LoginPage(props) {
                       className={
                         classes.checkboxAndRadio
                       }
-                      style={{textAlign: "center"}}
+                      style={{
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                        gap: '20px',
+                        marginBottom: '20px'
+                      }}
                     >
                       <FormControlLabel
                         control={
@@ -254,61 +303,73 @@ export default function LoginPage(props) {
                         label="Author"
                       />
                     </div>
-                    <CustomInput
-                      labelText="Email..."
-                      id="email"
-                      formControlProps={{
-                        fullWidth: true,
-                      }}
-                      inputProps={{
-                        onChange: handleEmailChange,
-                        type: "email",
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Email className={classes.inputIconsColor} />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                    <CustomInput
-                      labelText="Password"
-                      id="pass"
-                      formControlProps={{
-                        fullWidth: true,
-                      }}
-                      inputProps={{
-                        onChange: handlePasswordChange,
-                        type: "password",
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Icon className={classes.inputIconsColor}>
-                              lock_outline
-                            </Icon>
-                          </InputAdornment>
-                        ),
-                        autoComplete: "off",
-                      }}
-                    />
+                    <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                      <label htmlFor="email" className={classes.inputLabel}>
+                        Email
+                      </label>
+                      <CustomInput
+                        id="email"
+                        formControlProps={{
+                          fullWidth: true,
+                          style: { paddingTop: '0px' }
+                        }}
+                        inputProps={{
+                          onChange: handleEmailChange,
+                          type: "email",
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Email className={classes.inputIconsColor} />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </div>
+                    <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+                      <label htmlFor="pass" className={classes.inputLabel}>
+                        Password
+                      </label>
+                      <CustomInput
+                        id="pass"
+                        formControlProps={{
+                          fullWidth: true,
+                          style: { paddingTop: '0px' }
+                        }}
+                        inputProps={{
+                          onChange: handlePasswordChange,
+                          type: "password",
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Icon className={classes.inputIconsColor}>
+                                lock_outline
+                              </Icon>
+                            </InputAdornment>
+                          ),
+                          autoComplete: "off",
+                        }}
+                      />
+                    </div>
                   </CardBody>
                   <CardFooter className={classes.cardFooter}>
                     <Button color="github" onClick={onSubmitClick} type="submit" fullWidth={true} disabled={loading}>
                       {loading ? 'Logging in...' : 'Login with credentials'}
                     </Button>
                   </CardFooter>
-                  <CardFooter className={classes.cardFooter}>
-                    <GoogleLogin
-                      onSuccess={googleLogin}
-                      onError={() => {
-                        setErrorMsg("Google Login failed");
-                        setOpen(true);
-                      }}
-                      useOneTap
-                      theme="outline"
-                      size="large"
-                      text="signin_with"
-                      shape="rectangular"
-                    />
-                  </CardFooter>
+                  {isGoogleOAuthAvailable && (
+                    <CardFooter className={classes.cardFooter}>
+                      <GoogleLogin
+                        onSuccess={googleLogin}
+                        onError={() => {
+                          setCurrentError(new Error("Google Login failed"));
+                          setErrorOpen(true);
+                        }}
+                        useOneTap={false}
+                        theme="outline"
+                        size="large"
+                        text="signin_with"
+                        shape="rectangular"
+                      />
+                    </CardFooter>
+                  )}
                   <CardFooter className={classes.cardFooter}>
                     <Button color="github" onClick={onGuestClick} data-role="learner" type="submit" fullWidth={true}>
                       Guest Login
@@ -318,24 +379,12 @@ export default function LoginPage(props) {
               </Card>
             </GridItem>
           </GridContainer>
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            open={open}
-            autoHideDuration={3000}
-            onClose={handleClose}
-          >
-            <SnackbarContent
-              message={
-                <span>
-                  {errorMsg}
-                </span>
-              }
-              color="danger"
-            />
-          </Snackbar>
+          <ErrorHandler
+            open={errorOpen}
+            onClose={() => setErrorOpen(false)}
+            error={currentError}
+            showRecoveryAction={true}
+          />
         </div>
         <Footer whiteFont />
       </div>

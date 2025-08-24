@@ -70,7 +70,7 @@ export default function ProfilePage(props) {
         absolute
         color="transparent"
         brand="Interactive Tutorial System"
-        rightLinks={<HeaderLinks />}
+        leftLinks={<HeaderLinks />}
         {...rest}
       />
       <div

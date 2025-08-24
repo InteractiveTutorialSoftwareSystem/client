@@ -23,7 +23,7 @@ const customDropdownStyle = (theme) => ({
     border: "0",
     boxShadow: "0 2px 5px 0 rgba(0, 0, 0, 0.26)",
     top: "100%",
-    zIndex: "1000",
+    zIndex: "10000",
     minWidth: "160px",
     padding: "5px 0",
     margin: "2px 0 0",
@@ -32,6 +32,8 @@ const customDropdownStyle = (theme) => ({
     listStyle: "none",
     backgroundColor: "#fff",
     backgroundClip: "padding-box",
+    maxHeight: "none",
+    overflow: "visible",
   },
   menuList: {
     padding: "0",

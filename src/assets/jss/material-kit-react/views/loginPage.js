@@ -1,13 +1,23 @@
-import { container } from "assets/jss/material-kit-react.js";
+import { 
+  container, 
+  grayColor, 
+  darkGrayColor,
+  lightGrayColor,
+  whiteColor,
+  primaryColor,
+  secondaryColor,
+  defaultFont,
+  headingFont 
+} from "assets/jss/material-kit-react.js";
 
 const signupPageStyle = {
   container: {
     ...container,
     zIndex: "2",
     position: "relative",
-    paddingTop: "0",
-    color: "#FFFFFF",
-    paddingBottom: "0",
+    paddingTop: "3rem",
+    color: whiteColor,
+    paddingBottom: "3rem",
   },
   cardHidden: {
     opacity: "0",
@@ -51,10 +61,14 @@ const signupPageStyle = {
   cardHeader: {
     width: "auto",
     textAlign: "center",
-    marginLeft: "20px",
-    marginRight: "20px",
-    marginTop: "-40px",
-    marginBottom: "15px",
+    marginLeft: "24px",
+    marginRight: "24px",
+    marginTop: "-48px",
+    marginBottom: "24px",
+    borderRadius: "12px",
+    padding: "24px",
+    background: "linear-gradient(135deg, " + primaryColor + ", " + secondaryColor + ")",
+    boxShadow: "0 8px 16px -4px rgba(212, 165, 116, 0.25), 0 4px 12px 0px rgba(0, 0, 0, 0.08)",
   },
   socialIcons: {
     maxWidth: "24px",
@@ -75,7 +89,7 @@ const signupPageStyle = {
   cardFooter: {
     paddingTop: "0rem",
     border: "0",
-    borderRadius: "6px",
+    borderRadius: "12px",
     justifyContent: "center !important",
   },
   socialLine: {
@@ -94,6 +108,15 @@ const signupPageStyle = {
     justifyContent: "center !important",
     marginLeft: "0 !important",
     marginRight: "0 !important",
+  },
+  inputLabel: {
+    display: 'block',
+    marginBottom: '0.5rem',
+    color: grayColor,
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    ...defaultFont,
+    letterSpacing: '-0.01em'
   },
 };
 

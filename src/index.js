@@ -1,5 +1,4 @@
-// React import not needed in React 17+
-import { createRoot } from "react-dom/client";
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { ThemeProvider as StylesThemeProvider } from "@mui/styles";
@@ -21,45 +20,60 @@ import RegisterPage from "views/RegisterPage/RegisterPage.js";
 import AllTutorialsPage from "views/AllTutorialsPage/AllTutorialsPage.js";
 import TutorialPage from "views/TutorialPage/TutorialPage.js";
 import ProfilePage from "views/ProfilePage/ProfilePage.js";
+import AudioTest from "views/AudioTest/AudioTest.js";
 
 const theme = createTheme();
 
 const container = document.getElementById("root");
 const root = createRoot(container);
 
-root.render(
-  <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-    <ThemeProvider theme={theme}>
-      <StylesThemeProvider theme={theme}>
-        <div>
-    <Helmet>
-      <script src="//cdn.loop11.com/embed.js" type="text/javascript" async="async" />
-    </Helmet>
-    <Router basename={process.env.PUBLIC_URL || ""}>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/researchstudylogin" element={<ResearchStudyLoginPage />} />
+// Wrap the app content
+const AppContent = () => (
+  <ThemeProvider theme={theme}>
+    <StylesThemeProvider theme={theme}>
+      <div>
+        <Helmet>
+          <script src="//cdn.loop11.com/embed.js" type="text/javascript" async="async" />
+        </Helmet>
+        <Router basename={process.env.PUBLIC_URL || ""}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/researchstudylogin" element={<ResearchStudyLoginPage />} />
 
-        {/* Author */}
-        <Route path="/tutorial/create" element={<PrivateRoute roles={["author"]} component={CreateTutorialPage} />} />
-        <Route path="/tutorial/overview/:id" element={<PrivateRoute roles={["author"]} component={TutorialOverviewPage} />} />
-        <Route path="/tutorial/section/edit/:id" element={<PrivateRoute roles={["author"]} component={TutorialSectionPage} />} />
+            {/* Author */}
+            <Route path="/tutorial/create" element={<PrivateRoute roles={["author"]} component={CreateTutorialPage} />} />
+            <Route path="/tutorial/overview/:id" element={<PrivateRoute roles={["author"]} component={TutorialOverviewPage} />} />
+            <Route path="/tutorial/section/edit/:id" element={<PrivateRoute roles={["author"]} component={TutorialSectionPage} />} />
 
-        {/* Both */}
-        <Route path="/tutorial/:id/:pid" element={<PrivateRoute roles={["learner", "author"]} component={TutorialPage} />} />
-        <Route path="/tutorial" element={<PrivateRoute roles={["learner", "author"]} component={AllTutorialsPage} />} />
-        <Route path="/profile" element={<PrivateRoute roles={["learner", "author"]} component={ProfilePage} />} />
-        
-        {/* Components is for reference */}
-        <Route path="/components" element={<Components />} />
+            {/* Both */}
+            <Route path="/tutorial/:id/:pid" element={<PrivateRoute roles={["learner", "author"]} component={TutorialPage} />} />
+            <Route path="/tutorial" element={<PrivateRoute roles={["learner", "author"]} component={AllTutorialsPage} />} />
+            <Route path="/profile" element={<PrivateRoute roles={["learner", "author"]} component={ProfilePage} />} />
+            
+            {/* Components is for reference */}
+            <Route path="/components" element={<Components />} />
+            <Route path="/audiotest" element={<AudioTest />} />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-        </div>
-      </StylesThemeProvider>
-    </ThemeProvider>
-  </GoogleOAuthProvider>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </div>
+    </StylesThemeProvider>
+  </ThemeProvider>
 );
+
+// Only wrap with GoogleOAuthProvider if client ID is available
+const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
+if (googleClientId && googleClientId !== 'undefined') {
+  root.render(
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AppContent />
+    </GoogleOAuthProvider>
+  );
+} else {
+  console.warn('Google OAuth disabled: REACT_APP_GOOGLE_CLIENT_ID not configured');
+  root.render(<AppContent />);
+}

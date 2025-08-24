@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { flushSync } from 'react-dom';
 // useParams import removed as it's not used
 import PropTypes from 'prop-types';
 // @mui/material components
@@ -23,7 +24,6 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 // material ui icon
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 //dock
 import DockLayout from 'rc-dock';
 import "rc-dock/dist/rc-dock.css";
@@ -45,8 +45,8 @@ import ErrorIcon from '@mui/icons-material/Error';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 // Modal
-// Slide import removed as it's not used
-import Modal from 'react-bootstrap/Modal';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
 // Dialog, DialogTitle, and DialogContent imports removed as they're not used
 import IconButton from "@mui/material/IconButton";
 import '../../../assets/css/modal.css';
@@ -101,6 +101,11 @@ export default function CodeSection(props) {
   const [playbackEvents, setPlaybackEvents] = useState([]);
 
   const [currentTime, setCurrentTime] = useState(0);
+  const [seekPosition, setSeekPosition] = useState(null);
+
+
+  const [playState, setPlayState] = useState(false);
+  
   const [currentKeystroke, setCurrentKeystroke] = useState(0);
   const [currentConsoleAction, setCurrentConsoleAction] = useState(0);
   const [currentConsoleScrollAction, setCurrentConsoleScrollAction] = useState(0);
@@ -112,7 +117,6 @@ export default function CodeSection(props) {
   const [currentEditorScrollAction, setCurrentEditorScrollAction] = useState(0);
   const [currentTranscript, setCurrentTranscript] = useState(0);
   const [currentTranscriptText, setCurrentTranscriptText] = useState("");
-  const [playState, setPlayState] = useState(false);
   const [searchField, setSearchField] = useState("");
   const [stackoverflowSearchField, setStackoverflowSearchField] = useState("");
   const [consoleError, setConsoleError] = useState("");
@@ -128,6 +132,7 @@ export default function CodeSection(props) {
   const [showClearSearch, setShowClearSearch] = useState(false);
 
   const [showCodeRun, setShowCodeRun] = useState(true);
+  const [showCompile, setShowCompile] = useState(true);
   const [ide, setIde] = useState("");
   const [playbackCursor, setPlaybackCursor] = useState([1,1]);
   const [practiceCursor, setPracticeCursor] = useState([1,1]);
@@ -239,14 +244,6 @@ export default function CodeSection(props) {
             Ln {value.practiceCursor[0]}, Col {value.practiceCursor[1]} | Spaces: 4 | Filename: {value.filename}
           </div>}
         </Context.Consumer>
-        <Context.Consumer>
-          {(value) => value.showCodeRun?
-            <Button round color="success" className={classes.codeButton} onClick={() => handlePracticeRun()}>
-              <PlayArrowIcon /> Run Code 
-            </Button>:
-            <CircularProgress className={classes.spinner}/>
-          }
-        </Context.Consumer>
       </div>
     )}
   }
@@ -297,14 +294,6 @@ export default function CodeSection(props) {
                         {(value) => <div className={classes.bottomLeftDiv}>
                           Ln {value.playbackCursor[0]}, Col {value.playbackCursor[1]} | Spaces: 4 | Filename: {value.filename}
                         </div>}
-                    </Context.Consumer>
-                    <Context.Consumer>
-                      {(value) => value.showCodeRun?
-                        <Button id="playback-code-run-button" round color="success" className={classes.codeButton} onClick={() => {handlePlaybackRun(); setRandom(value.random + 1)}}>
-                          <PlayArrowIcon /> Run Code 
-                        </Button>:
-                        <CircularProgress className={classes.spinner}/>
-                      }
                     </Context.Consumer>
                   </div>
                 )}, 
@@ -420,6 +409,8 @@ export default function CodeSection(props) {
     });
   }, [props.input])
 
+
+
   useEffect(() => {
     const descriptionDiv = document.getElementById("description-preview")
     setDescriptionInnerText(descriptionDiv.innerText.split('\n').filter((elem) => elem != ""))
@@ -482,6 +473,57 @@ export default function CodeSection(props) {
       });
   }
 
+  const handlePlaybackCompile = () => {
+    // Playback tab code compile function
+    if (!props.consoleIdeRef.current) {
+      return
+    }
+    const ide = props.playbackIdeRef.current.editor.getValue();
+    setShowCompile(false);
+    setRandom(random + 1);
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ data: ide, filename: props.filename })
+    };
+
+    fetch(process.env.REACT_APP_TUTORIAL_URL + '/compile_script/' + props.languageChosen, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        let newResult = props.consoleIdeRef.current.editor.getValue() + "> " + data.output;
+        if (data.time) {
+          newResult += "> Compile time: " + (Math.ceil(data.time * 1000)/1000).toFixed(3) + "s\n";
+        }
+        props.consoleIdeRef.current.editor.setValue(newResult);
+        props.consoleIdeRef.current.editor.clearSelection();
+        props.consoleIdeRef.current.editor.session.setScrollTop(99999999);
+        
+        // Set console error if compilation failed
+        if (!data.success && data.output) {
+          const output = data.output.toLowerCase();
+          if (output.includes("error") || output.includes("exception")) {
+            const sentenceArray = output.split("\n")
+            for (const sentence of sentenceArray) {
+              if (sentence.includes("error") || sentence.includes("exception")) {
+                let consoleErrorString = ""
+                for (const word of sentence.split(" ")) {
+                  if (props.languageChosen == "java") {
+                    if (word.includes("error") || word.includes("exception")) {
+                      consoleErrorString += word + " ";
+                    }
+                  }
+                }
+                setConsoleError(consoleErrorString);
+              }
+            }
+          }
+        } else {
+          setConsoleError("");
+        }
+
+        setShowCompile(true);
+      });
+  }
+
   const handlePracticeRun = () => {
     // Practice tab code run function
     if (!props.consoleIdeRef.current) {
@@ -512,6 +554,32 @@ export default function CodeSection(props) {
       });
   }
 
+  const handlePracticeCompile = () => {
+    // Practice tab code compile function
+    if (!props.consoleIdeRef.current) {
+      return
+    }
+    const ide = practiceIdeRef.current.editor.getValue();
+    setShowCompile(false);
+    const requestOptions = {
+      method: 'POST',
+      body: JSON.stringify({ data: ide, filename: props.filename })
+    };
+
+    fetch(process.env.REACT_APP_TUTORIAL_URL + '/compile_script/' + props.languageChosen, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        let newResult = props.consoleIdeRef.current.editor.getValue() + "> " + data.output;
+        if (data.time) {
+          newResult += "> Compile time: " + (Math.ceil(data.time * 1000)/1000).toFixed(3) + "s\n";
+        }
+        props.consoleIdeRef.current.editor.setValue(newResult);
+        props.consoleIdeRef.current.editor.clearSelection();
+        props.consoleIdeRef.current.editor.session.setScrollTop(999999999);
+        setShowCompile(true);
+      });
+  }
+
   const removeTagsAndCodes = (text) => {
     // remove the html tags and code tag from markdown description
     const strippedText = decode(text.replace(/<(.|\n)*?>/g, '').replace(/\n/g, ' '));
@@ -533,53 +601,53 @@ export default function CodeSection(props) {
     if (props.playbackIdeRef.current) {
       props.playbackIdeRef.current.editor.clearSelection();
     }
-    if (props.keystrokes && props.keystrokes.length) {
-      for (let i = currentKeystroke; i < props.keystrokes.length; i++) {
+    if (props.keystrokes && props.keystrokes.length > 0) {
+      for (var i = currentKeystroke; i < props.keystrokes.length; i++) {
         createIdeEvent(i, currentTime);
       }
     }
-    if (props.consoleActions && props.consoleActions.length) {
-      for (let i = currentConsoleAction; i < props.consoleActions.length; i++) {
+    if (props.consoleActions && props.consoleActions.length > 0) {
+      for (var i = currentConsoleAction; i < props.consoleActions.length; i++) {
         createConsoleEvent(i, currentTime);
       }
     }
-    if (props.consoleScrollActions && props.consoleScrollActions.length) {
-      for (let i = currentConsoleScrollAction; i < props.consoleScrollActions.length; i++){
+    if (props.consoleScrollActions && props.consoleScrollActions.length > 0) {
+      for (var i = currentConsoleScrollAction; i < props.consoleScrollActions.length; i++){
         createConsoleScrollEvent(i, currentTime);
       }
     }
-    if(props.inputKeystrokes && props.inputKeystrokes.length){
-      for (let i = currentInputKeystroke; i < props.inputKeystrokes.length; i++){
+    if(props.inputKeystrokes !== null && props.inputKeystrokes !== undefined ){
+      for (var i = currentInputKeystroke; i < props.inputKeystrokes.length; i++){
         createInputEvent(i, currentTime);
       }
     }
-    if (props.inputScrollActions && props.inputScrollActions.length) {
-      for (let i = currentInputScrollAction; i < props.inputScrollActions.length; i++){
+    if (props.inputScrollActions && props.inputScrollActions.length > 0) {
+      for (var i = currentInputScrollAction; i < props.inputScrollActions.length; i++){
         createInputScrollEvent(i, currentTime);
       }
     }
-    if (props.layoutActions && props.layoutActions.length) {
-      for (let i = currentLayoutAction; i < props.layoutActions.length; i++) {
+    if (props.layoutActions && props.layoutActions.length > 0) {
+      for (var i = currentLayoutAction; i < props.layoutActions.length; i++) {
         createLayoutEvent(i, currentTime);
       }
     }
-    if (props.selectActions && props.selectActions.length) {
-      for (let i = currentSelectAction; i < props.selectActions.length; i++) {
+    if (props.selectActions && props.selectActions.length > 0) {
+      for (var i = currentSelectAction; i < props.selectActions.length; i++) {
         createMarkdownSelectEvent(i, currentTime);
       }
     }
-    if (props.scrollActions && props.scrollActions.length) {
-      for (let i = currentScrollAction; i < props.scrollActions.length; i++) {
+    if (props.scrollActions && props.scrollActions.length > 0) {
+      for (var i = currentScrollAction; i < props.scrollActions.length; i++) {
         createMarkdownScrollEvent(i, currentTime);
       }
     }
-    if (props.editorScrollActions && props.editorScrollActions.length) {
-      for (let i = currentEditorScrollAction; i < props.editorScrollActions.length; i++){
+    if (props.editorScrollActions && props.editorScrollActions.length > 0) {
+      for (var i = currentEditorScrollAction; i < props.editorScrollActions.length; i++){
         createEditorScrollEvent(i, currentTime);
       }
     }
-    if (props.transcript && props.transcript.length) {
-      for (let i = currentTranscript; i < props.transcript.length; i++) {
+    if (props.transcript) {
+      for (var i = currentTranscript; i < props.transcript.length; i++) {
         createTranscriptEvent(i, currentTime);
       }
     }
@@ -683,9 +751,9 @@ export default function CodeSection(props) {
 
   function createLayoutEvent(i, time) {
     // Handles playback layout changes
-    const k = props.layoutActions[i];
+    var k = props.layoutActions[i];
     if(k !== undefined){
-      const evt = setTimeout(() => {
+      var evt = setTimeout(() => {
         props.layoutRef.current.loadLayout(props.layoutActions[i].layout);
         props.layoutRef.current.dockMove(practiceTab(), 'editor', "after-tab")
         props.layoutRef.current.dockMove(props.layoutRef.current.find('editor'), 'practice', "before-tab")
@@ -823,11 +891,105 @@ export default function CodeSection(props) {
     return Promise.resolve(time);
   }
 
+  function seeked() {
+    // Set respective states of playbook when Media Player is seeked
+    // Continue to play from seeked if Media Player was playing when seeked
+    var currentPlayState = playState;
+    props.player.current.audio.current.pause();
+
+    pause()
+    .then((time)=>{
+      // Use flushSync to ensure state updates happen synchronously for React 18
+      flushSync(() => {
+        var keystroke = getCurrentElement(props.keystrokes, time);
+        setCurrentKeystroke(keystroke);
+        
+        var consoleAction = getCurrentElement(props.consoleActions, time);
+        setCurrentConsoleAction(consoleAction);
+        
+        var consoleScrollAction = getCurrentElement(props.consoleScrollActions, time);
+        setCurrentConsoleScrollAction(consoleScrollAction);
+
+        if(props.inputKeystrokes !== null && props.inputKeystrokes !== undefined){
+          var inputKeystroke = getCurrentElement(props.inputKeystrokes, time);
+          setCurrentInputKeystroke(inputKeystroke);
+        }
+        var inputScrollAction = getCurrentElement(props.inputScrollActions, time);
+        setCurrentInputScrollAction(inputScrollAction);
+        
+        var layoutAction = getCurrentElement(props.layoutActions, time);
+        setCurrentLayoutAction(layoutAction);
+        
+        var selectAction = getCurrentElement(props.selectActions, time);
+        setCurrentSelectAction(selectAction);
+        
+        var scrollAction = getCurrentElement(props.scrollActions, time);
+        setCurrentScrollAction(scrollAction);
+        
+        var editorScrollAction = getCurrentElement(props.editorScrollActions, time);
+        setCurrentEditorScrollAction(editorScrollAction);
+
+        if (props.transcript) {
+          var transcript = getCurrentElement(props.transcript, time);
+          setCurrentTranscript(transcript);
+        }
+      });
+      
+      // Create events after state is flushed
+      var keystroke = getCurrentElement(props.keystrokes, time);
+      if (keystroke >= 0) createIdeEvent(keystroke, time);
+      
+      var consoleAction = getCurrentElement(props.consoleActions, time);
+      if (consoleAction >= 0) createConsoleEvent(consoleAction, time);
+      
+      var consoleScrollAction = getCurrentElement(props.consoleScrollActions, time);
+      if (consoleScrollAction >= 0) createConsoleScrollEvent(consoleScrollAction, time);
+
+      if(props.inputKeystrokes !== null && props.inputKeystrokes !== undefined){
+        var inputKeystroke = getCurrentElement(props.inputKeystrokes, time);
+        if (inputKeystroke >= 0) createInputEvent(inputKeystroke, time);
+      } else{
+        var inputKeystroke = ""
+      }
+      var inputScrollAction = getCurrentElement(props.inputScrollActions, time);
+      if (inputScrollAction >= 0) createInputScrollEvent(inputScrollAction, time);
+      
+      var layoutAction = getCurrentElement(props.layoutActions, time);
+      if (layoutAction >= 0) createLayoutEvent(layoutAction, time);
+      
+      var selectAction = getCurrentElement(props.selectActions, time);
+      if (selectAction >= 0) createMarkdownSelectEvent(selectAction, time);
+      
+      var scrollAction = getCurrentElement(props.scrollActions, time);
+      if (scrollAction >= 0) createMarkdownScrollEvent(scrollAction, time);
+      
+      var editorScrollAction = getCurrentElement(props.editorScrollActions, time);
+      if (editorScrollAction >= 0) createEditorScrollEvent(editorScrollAction, time);
+
+      if (props.transcript) {
+        var transcript = getCurrentElement(props.transcript, time);
+        if (transcript >= 0) createTranscriptEvent(transcript, time);
+      } else {
+        var transcript = "";
+      }
+      return Promise.resolve([keystroke, consoleAction, consoleScrollAction, inputKeystroke, inputScrollAction, layoutAction, selectAction, scrollAction, editorScrollAction, transcript, time]);
+    })
+    .then(([keystroke, consoleAction, consoleScrollAction, inputKeystroke, inputScrollAction, layoutAction, selectAction, scrollAction, editorScrollAction, transcript, time])=>{
+      if (currentPlayState) {
+        props.player.current.audio.current.play();
+      }
+    });
+    
+  }
+
   function getCurrentElement(elementArray, time) {
     // return index of elementArray which would be run at given time (it's a binary search) 
-    let bottom = 0;
-    let top = elementArray.length - 1;
-    let mid = 0;
+    if (!elementArray || elementArray.length === 0) {
+      return -1;
+    }
+    var bottom = 0;
+    var top = elementArray.length - 1;
+    var mid = 0;
     while (bottom <= top) {
       mid = Math.floor((bottom + top) / 2);
       if (time < elementArray[mid].timestamp) {
@@ -849,64 +1011,6 @@ export default function CodeSection(props) {
     return mid;
   }
 
-  function seeked() {
-    // Set respective states of playback when Media Player is seeked
-    // Continue to play from seeked if Media Player was playing when seeked
-    const currentPlayState = playState;
-    props.player.current.audio.current.pause();
-
-    pause()
-    .then((time)=>{
-      const keystroke = getCurrentElement(props.keystrokes, time);
-      setCurrentKeystroke(keystroke);
-      createIdeEvent(keystroke, time);
-      const consoleAction = getCurrentElement(props.consoleActions, time);
-      setCurrentConsoleAction(consoleAction);
-      createConsoleEvent(consoleAction, time);
-      const consoleScrollAction = getCurrentElement(props.consoleScrollActions, time);
-      setCurrentConsoleScrollAction(consoleScrollAction);
-      createConsoleScrollEvent(consoleScrollAction, time);
-
-      let inputKeystroke;
-      if(props.inputKeystrokes !== null && props.inputKeystrokes !== undefined){
-        inputKeystroke = getCurrentElement(props.inputKeystrokes, time);
-        setCurrentInputKeystroke(inputKeystroke);
-        createInputEvent(inputKeystroke, time);
-      } else{
-        inputKeystroke = ""
-      }
-      const inputScrollAction = getCurrentElement(props.inputScrollActions, time);
-      setCurrentInputScrollAction(inputScrollAction);
-      createInputScrollEvent(inputScrollAction, time);
-      const layoutAction = getCurrentElement(props.layoutActions, time);
-      setCurrentLayoutAction(layoutAction);
-      createLayoutEvent(layoutAction, time);
-      const selectAction = getCurrentElement(props.selectActions, time);
-      setCurrentSelectAction(selectAction);
-      createMarkdownSelectEvent(selectAction, time);
-      const scrollAction = getCurrentElement(props.scrollActions, time);
-      setCurrentScrollAction(scrollAction);
-      createMarkdownScrollEvent(scrollAction, time);
-      const editorScrollAction = getCurrentElement(props.editorScrollActions, time);
-      setCurrentEditorScrollAction(editorScrollAction);
-      createEditorScrollEvent(editorScrollAction, time);
-
-      let transcript;
-      if (props.transcript) {
-        transcript = getCurrentElement(props.transcript, time);
-        setCurrentTranscript(transcript);
-        createTranscriptEvent(transcript, time);
-      } else {
-        transcript = "";
-      }
-      return Promise.resolve([keystroke, consoleAction, consoleScrollAction, inputKeystroke, inputScrollAction, layoutAction, selectAction, scrollAction, editorScrollAction, transcript, time]);
-    })
-    .then(([keystroke, consoleAction, consoleScrollAction, inputKeystroke, inputScrollAction, layoutAction, selectAction, scrollAction, editorScrollAction, transcript, time])=>{
-      if (currentPlayState) {
-        props.player.current.audio.current.play();
-      }
-    });
-  }
 
   const handleSearchResult = (keyword) => {
     // return search result from user's input
@@ -959,9 +1063,11 @@ export default function CodeSection(props) {
     instance.unmark();
     setShowClearSearch(false);
     props.setShowSearchModal(false);
-    props.player.current.audio.current.currentTime = time/1000;
-    props.player.current.audio.current.playbackRate=playbackSpeed
-    props.player.current.audio.current.play();
+    if (props.player.current?.audio.current) {
+      props.player.current.audio.current.currentTime = time/1000;
+      props.player.current.audio.current.playbackRate = playbackSpeed;
+      props.player.current.audio.current.play();
+    }
   }
 
   const handleTabChange = (event, newValue) => {
@@ -1013,6 +1119,67 @@ export default function CodeSection(props) {
     setShowClearSearch(false);
   }
 
+  
+  // Function to detect which tab is currently active
+  const getActiveEditorTab = () => {
+    // Check which dock tab is currently active by looking for active tab elements
+    const activeTabs = document.querySelectorAll('.dock-tab.dock-tab-active');
+    
+    // Look for active tab with specific text content
+    for (let tab of activeTabs) {
+      const tabText = tab.textContent || tab.innerText || '';
+      
+      if (tabText.includes('Practice')) {
+        return 'practice';
+      }
+      if (tabText.includes('Playback')) {
+        return 'editor';
+      }
+    }
+    
+    // Fallback: try checking refs directly
+    if (practiceIdeRef.current && practiceIdeRef.current.editor) {
+      const practiceContainer = practiceIdeRef.current.container;
+      if (practiceContainer && practiceContainer.offsetParent !== null) {
+        return 'practice';
+      }
+    }
+    
+    // Default to editor if can't determine
+    return 'editor';
+  };
+
+  // Expose functions globally for header buttons
+  useEffect(() => {
+    window.handleRunCode = () => {
+      const currentActiveTab = getActiveEditorTab();
+      if (currentActiveTab === 'practice') {
+        // If practice tab is active, use practice handler
+        handlePracticeRun();
+      } else {
+        // Otherwise use playbook handler
+        handlePlaybackRun();
+      }
+    };
+    
+    window.handleCompileCode = () => {
+      const currentActiveTab = getActiveEditorTab();
+      if (currentActiveTab === 'practice') {
+        // If practice tab is active, use practice handler
+        handlePracticeCompile();
+      } else {
+        // Otherwise use playback handler  
+        handlePlaybackCompile();
+      }
+    };
+    
+    return () => {
+      // Cleanup
+      delete window.handleRunCode;
+      delete window.handleCompileCode;
+    };
+  }, []);
+  
   return (
     <div>
       <Grid container spacing={0} className={classes.gridContainer}>
@@ -1020,6 +1187,7 @@ export default function CodeSection(props) {
         <Context.Provider
           value={{
             showCodeRun,
+            showCompile,
             "description": props.description,
             ide,
             "filename": props.filename,
@@ -1031,6 +1199,7 @@ export default function CodeSection(props) {
             showClearSearch
           }}
         >
+        
         <DockLayout
           defaultLayout={defaultLayout}
           ref={props.layoutRef}
@@ -1051,10 +1220,13 @@ export default function CodeSection(props) {
             autoPlay={false}
             ref={props.player}
             src={props.recordingSrc}
+            preload="auto"
             layout="horizontal"
             onPlay={()=>play()}
             onPause={()=>pause()}
-            onSeek={()=>pause()}
+            onSeek={()=>{
+              console.log("onSeek called - doing nothing");
+            }}
             onSeeked={()=>seeked()}
             customAdditionalControls={[
               <div key="playback-settings">
@@ -1076,10 +1248,6 @@ export default function CodeSection(props) {
                     </Grid>
                   </Grid>
                 </MenuItem>
-                <MenuItem
-                  label="Playback speed"
-                  parentMenuOpen={true}
-                >
                 {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((val,index)=>
                     <MenuItem 
                     value={val} 
@@ -1089,13 +1257,14 @@ export default function CodeSection(props) {
                           setPlaybackSpeed(val);
                           pause();
                           seeked();
-                          props.player.current.audio.current.playbackRate = val
+                          if (props.player.current?.audio.current) {
+                            props.player.current.audio.current.playbackRate = val;
+                          }
                         }}
                       >
-                      {val}
+                      {val}x
                       </MenuItem>
                   )}
-                </MenuItem>
               </Menu>
             </div>
             ]}
@@ -1104,20 +1273,44 @@ export default function CodeSection(props) {
       </Grid>
 
       {/* Search Dialog */}
-      <Modal show={props.showSearchModal} onHide={() => props.setShowSearchModal(false)} centered dialogClassName="searchModal" scrollable={true} size='xl'>
-        <Modal.Header closeButton id="classic-modal-slide-title" className={classes.modalHeader}>
-          <Tabs
-            value={props.tabValue}
-            onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
-            aria-label="full width tabs example"
-          >
-            <Tab label="Tutorial" />
-            <Tab label="StackOverflow" />
-          </Tabs>
-        </Modal.Header>
-        <Modal.Body id="modal-slide-description" className={classes.searchModal}>
+      <Modal 
+        open={props.showSearchModal} 
+        onClose={() => props.setShowSearchModal(false)}
+        aria-labelledby="search-modal-title"
+      >
+        <Box style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: '1200px',
+          maxHeight: '90vh',
+          backgroundColor: '#fff',
+          border: '1px solid #ccc',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          overflow: 'auto'
+        }}>
+          <div id="classic-modal-slide-title" className={classes.modalHeader}>
+            <IconButton
+              onClick={() => props.setShowSearchModal(false)}
+              style={{ position: 'absolute', right: 8, top: 8 }}
+            >
+              <Close />
+            </IconButton>
+            <Tabs
+              value={props.tabValue}
+              onChange={handleTabChange}
+              indicatorColor="primary"
+              textColor="primary"
+              aria-label="full width tabs example"
+            >
+              <Tab label="Tutorial" />
+              <Tab label="StackOverflow" />
+            </Tabs>
+          </div>
+          <div id="modal-slide-description" className={classes.searchModal}>
           <TabPanel value={props.tabValue} index={0}>
             <CustomInput
               id="regular"
@@ -1151,7 +1344,7 @@ export default function CodeSection(props) {
                 {frequentWord && (
                   frequentWord.map((data) => {
                     return (
-                      <li key={data.key}>
+                      <span key={data.key}>
                         <Chip
                           label={data.label}
                           className={classes.chip}
@@ -1159,7 +1352,7 @@ export default function CodeSection(props) {
                             handleSearchResult(data.label.toLowerCase());
                           }}
                         />
-                      </li>
+                      </span>
                     );
                   })
                 )}
@@ -1302,7 +1495,8 @@ export default function CodeSection(props) {
 
             </div>
           </TabPanel>
-        </Modal.Body>
+          </div>
+        </Box>
       </Modal>
     </div>
   );

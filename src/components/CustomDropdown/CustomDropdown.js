@@ -119,8 +119,24 @@ export default function CustomDropdown(props) {
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         transition
-        // disablePortal
+        // disablePortal (using portal for highest z-index)
         placement={placementPopper()}
+        style={{position: 'fixed', zIndex: 10000, marginTop: '8px'}}
+        container={() => document.body}
+        modifiers={[
+          {
+            name: 'preventOverflow',
+            options: {
+              boundary: 'viewport',
+            },
+          },
+          {
+            name: 'flip',
+            options: {
+              fallbackPlacements: ['bottom-start', 'bottom-end', 'top-start', 'top-end'],
+            },
+          },
+        ]}
         className={classNames({
           [classes.popperClose]: !anchorEl,
           [classes.popperResponsive]: true,
@@ -136,7 +152,7 @@ export default function CustomDropdown(props) {
                 : { transformOrigin: "0 0 0" }
             }
           >
-            <Paper className={classes.dropdown}>
+            <Paper className={classes.dropdown} style={{zIndex: 10000, position: 'relative'}}>
               <ClickAwayListener onClickAway={handleCloseAway}>
                 <MenuList role="menu" className={classes.menuList}>
                   {dropdownHeader !== undefined ? (

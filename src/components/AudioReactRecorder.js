@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types' // ES6
+import { grayColor } from "assets/jss/material-kit-react.js";
 
 // export const AudioReactRecorder = ({ text }) => {
 //   return <div className={styles.test}>BULLSWEET: {text}</div>
@@ -35,8 +36,8 @@ export default class AudioReactRecorder extends React.Component {
   static defaultProps = {
     state: RecordState.NONE,
     type: 'audio/wav',
-    backgroundColor: 'rgb(200, 200, 200)',
-    foregroundColor: 'rgb(0, 0, 0)',
+    backgroundColor: grayColor,
+    foregroundColor: 'rgba(0, 0, 0, 0.87)',
     canvasWidth: 500,
     canvasHeight: 300
   }

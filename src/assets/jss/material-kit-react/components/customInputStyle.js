@@ -1,7 +1,11 @@
 import {
   primaryColor,
+  secondaryColor,
   dangerColor,
   successColor,
+  grayColor,
+  darkGrayColor,
+  lightGrayColor,
   defaultFont,
 } from "assets/jss/material-kit-react.js";
 
@@ -13,11 +17,12 @@ const customInputStyle = {
   },
   underline: {
     "&:hover:not($disabled):before,&:before": {
-      borderColor: "#D2D2D2 !important",
+      borderColor: grayColor + " !important",
       borderWidth: "1px !important",
     },
     "&:after": {
       borderColor: primaryColor,
+      borderWidth: "2px !important",
     },
   },
   underlineError: {
@@ -40,12 +45,12 @@ const customInputStyle = {
   },
   labelRoot: {
     ...defaultFont,
-    color: "#AAAAAA !important",
-    fontWeight: "400",
-    fontSize: "14px",
-    lineHeight: "1.42857",
+    color: grayColor + " !important",
+    fontWeight: "500",
+    fontSize: "0.875rem",
+    lineHeight: "1.5",
     top: "10px",
-    letterSpacing: "unset",
+    letterSpacing: "-0.01em",
     "& + $underline": {
       marginTop: "0px",
     },
@@ -65,17 +70,17 @@ const customInputStyle = {
     },
   },
   input: {
-    color: "#495057",
+    color: darkGrayColor,
     height: "unset",
     "&,&::placeholder": {
-      fontSize: "14px",
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: "0.875rem",
+      ...defaultFont,
       fontWeight: "400",
-      lineHeight: "1.42857",
+      lineHeight: "1.5",
       opacity: "1",
     },
     "&::placeholder": {
-      color: "#AAAAAA",
+      color: lightGrayColor,
     },
   },
   whiteInput: {
